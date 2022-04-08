@@ -70,25 +70,11 @@ class MainAppWidget extends StatelessWidget {
   }
 }
 
-class GoogleAuthApi {
-  static final _googleSignIn =
-      GoogleSignIn(scopes: ['https://mail.google.com/']);
-
-  static Future<GoogleSignInAccount?> signIn() async {
-    if (await _googleSignIn.isSignedIn()) {
-      return _googleSignIn.currentUser;
-    } else {
-      return await _googleSignIn.signIn();
-    }
-  }
-
-  static Future signOut() => _googleSignIn.signOut();
-}
-
 class PuttingSetup extends StatelessWidget {
   const PuttingSetup({Key? key}) : super(key: key);
 
   Future sendEmail() async {
+    print('pressed button');
     // GoogleAuthApi.signOut();
     // return;
     final user = await GoogleAuthApi.signIn();
@@ -101,12 +87,21 @@ class PuttingSetup extends StatelessWidget {
 
     print("Authenticated: $email");
 
+    print(Directory.current);
+
     final smtpServer = gmailSaslXoauth2(email, token!);
+
+    GoogleAuthApi.signOut();
     final message = Message()
       ..from = Address(email, 'Janne')
       ..recipients = ['janneo011@gmail.com']
-      ..subject = 'Hello Janne'
-      ..text = 'This is a test email!';
+      ..subject = 'Testing 123'
+      ..text = 'This is a test email!'
+      ..attachments = [
+        FileAttachment(File("/text.txt"))
+          ..location = Location.attachment
+          ..cid = 'text.txt'
+      ];
 
     try {
       await send(message, smtpServer);
@@ -200,6 +195,21 @@ class PuttingSetup extends StatelessWidget {
       ),
     );
   }
+}
+
+class GoogleAuthApi {
+  static final _googleSignIn =
+      GoogleSignIn(scopes: ['https://mail.google.com/']);
+
+  static Future<GoogleSignInAccount?> signIn() async {
+    if (await _googleSignIn.isSignedIn()) {
+      return _googleSignIn.currentUser;
+    } else {
+      return await _googleSignIn.signIn();
+    }
+  }
+
+  static Future signOut() => _googleSignIn.signOut();
 }
 
 class NotesField extends StatefulWidget {

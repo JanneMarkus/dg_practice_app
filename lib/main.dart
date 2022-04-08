@@ -70,6 +70,21 @@ class MainAppWidget extends StatelessWidget {
   }
 }
 
+class GoogleAuthApi {
+  static final _googleSignIn =
+      GoogleSignIn(scopes: ['https://mail.google.com/']);
+
+  static Future<GoogleSignInAccount?> signIn() async {
+    if (await _googleSignIn.isSignedIn()) {
+      return _googleSignIn.currentUser;
+    } else {
+      return await _googleSignIn.signIn();
+    }
+  }
+
+  static Future signOut() => _googleSignIn.signOut();
+}
+
 class PuttingSetup extends StatelessWidget {
   const PuttingSetup({Key? key}) : super(key: key);
 
@@ -185,21 +200,6 @@ class PuttingSetup extends StatelessWidget {
       ),
     );
   }
-}
-
-class GoogleAuthApi {
-  static final _googleSignIn =
-      GoogleSignIn(scopes: ['https://mail.google.com/']);
-
-  static Future<GoogleSignInAccount?> signIn() async {
-    if (await _googleSignIn.isSignedIn()) {
-      return _googleSignIn.currentUser;
-    } else {
-      return await _googleSignIn.signIn();
-    }
-  }
-
-  static Future signOut() => _googleSignIn.signOut();
 }
 
 class NotesField extends StatefulWidget {

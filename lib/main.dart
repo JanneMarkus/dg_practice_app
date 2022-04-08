@@ -4,6 +4,7 @@ import 'global.dart' as global;
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'database_helper.dart';
+import 'package:mailer/mailer.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -70,6 +71,23 @@ class MainAppWidget extends StatelessWidget {
 class PuttingSetup extends StatelessWidget {
   const PuttingSetup({Key? key}) : super(key: key);
 
+  final fromEmail = 'janneo011@gmail.com';
+  final toEmail = 'janneo011@gmail.com';
+
+  Future sendEmail() async {
+    final message = Message()
+      ..from = Address(fromEmail, 'Janne')
+      ..recipients = [toEmail]
+      ..subject = 'Hello Janne'
+      ..text = 'This is a test email!';
+
+    try {
+      await send(message);
+    } on MailerExpection catch (e) {
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -79,6 +97,11 @@ class PuttingSetup extends StatelessWidget {
       },
       child: ListView(
         children: [
+          ElevatedButton(
+            onPressed: sendEmail,
+            child: const Text("Email Database"),
+            style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(20)),
+          ),
           SizedBox(
             height: 250,
             child: Column(

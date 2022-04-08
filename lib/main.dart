@@ -98,7 +98,8 @@ class PuttingSetup extends StatelessWidget {
       ..subject = 'Testing 123'
       ..text = 'This is a test email!'
       ..attachments = [
-        FileAttachment(File("/text.txt"))
+        FileAttachment(
+            File("/data/data/com.example.putting_app_v2/files/text.txt"))
           ..location = Location.attachment
           ..cid = 'text.txt'
       ];

@@ -83,8 +83,10 @@ class PuttingSetup extends StatelessWidget {
     final email = user.email;
     final auth = await user.authentication;
     final token = auth.accessToken;
-    final smtpServer = gmailSaslXoauth2(email, token!);
 
+    print("Authenticated: $email");
+
+    final smtpServer = gmailSaslXoauth2(email, token!);
     final message = Message()
       ..from = Address(email, 'Janne')
       ..recipients = ['janneo011@gmail.com']

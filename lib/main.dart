@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:mailer/smtp_server/gmail.dart';
 import 'global.dart' as global;
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'database_helper.dart';
 import 'package:mailer/mailer.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -71,19 +73,27 @@ class MainAppWidget extends StatelessWidget {
 class PuttingSetup extends StatelessWidget {
   const PuttingSetup({Key? key}) : super(key: key);
 
-  final fromEmail = 'janneo011@gmail.com';
-  final toEmail = 'janneo011@gmail.com';
-
   Future sendEmail() async {
+    // GoogleAuthApi.signOut();
+    // return;
+    final user = await GoogleAuthApi.signIn();
+
+    if (user == null) return;
+
+    final email = user.email;
+    final auth = await user.authentication;
+    final token = auth.accessToken;
+    final smtpServer = gmailSaslXoauth2(email, token!);
+
     final message = Message()
-      ..from = Address(fromEmail, 'Janne')
-      ..recipients = [toEmail]
+      ..from = Address(email, 'Janne')
+      ..recipients = ['janneo011@gmail.com']
       ..subject = 'Hello Janne'
       ..text = 'This is a test email!';
 
     try {
-      await send(message);
-    } on MailerExpection catch (e) {
+      await send(message, smtpServer);
+    } on MailerException catch (e) {
       print(e);
     }
   }
@@ -173,6 +183,21 @@ class PuttingSetup extends StatelessWidget {
       ),
     );
   }
+}
+
+class GoogleAuthApi {
+  static final _googleSignIn =
+      GoogleSignIn(scopes: ['https://mail.google.com/']);
+
+  static Future<GoogleSignInAccount?> signIn() async {
+    if (await _googleSignIn.isSignedIn()) {
+      return _googleSignIn.currentUser;
+    } else {
+      return await _googleSignIn.signIn();
+    }
+  }
+
+  static Future signOut() => _googleSignIn.signOut();
 }
 
 class NotesField extends StatefulWidget {

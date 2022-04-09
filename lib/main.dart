@@ -67,6 +67,129 @@ class MainAppWidget extends StatelessWidget {
   }
 }
 
+class WindDirectionPicker extends StatefulWidget {
+  WindDirectionPicker({Key? key}) : super(key: key);
+  @override
+  State<WindDirectionPicker> createState() => _WindDirectionPickerState();
+}
+
+class _WindDirectionPickerState extends State<WindDirectionPicker> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(),
+        body: Center(
+          child: Column(children: [
+            Row(children: [
+              GestureDetector(
+                onTap: () => setState(() {
+                  global.windDirection = "Right to Left Tailwind";
+                  print(global.windDirection);
+                  Navigator.pop(context);
+                }),
+                child: SizedBox(
+                    height: MediaQuery.of(context).size.width / 3,
+                    width: MediaQuery.of(context).size.width / 3,
+                    child: const Center(child: Text("Right to Left Tailwind"))),
+              ),
+              GestureDetector(
+                onTap: () => setState(() {
+                  global.windDirection = "Tailwind";
+                  print(global.windDirection);
+                  Navigator.pop(context);
+                }),
+                child: SizedBox(
+                    height: MediaQuery.of(context).size.width / 3,
+                    width: MediaQuery.of(context).size.width / 3,
+                    child: const Center(child: Text("Tailwind"))),
+              ),
+              GestureDetector(
+                onTap: () => setState(() {
+                  global.windDirection = "Left to Right Tailwind";
+                  print(global.windDirection);
+                  Navigator.pop(context);
+                }),
+                child: SizedBox(
+                    height: MediaQuery.of(context).size.width / 3,
+                    width: MediaQuery.of(context).size.width / 3,
+                    child: const Center(child: Text("Left to Right Tailwind"))),
+              ),
+            ]),
+            Row(children: [
+              GestureDetector(
+                onTap: () => setState(() {
+                  global.windDirection = "Right to Left";
+                  print(global.windDirection);
+                  Navigator.pop(context);
+                }),
+                child: SizedBox(
+                    height: MediaQuery.of(context).size.width / 3,
+                    width: MediaQuery.of(context).size.width / 3,
+                    child: const Center(child: Text("Right to Left"))),
+              ),
+              GestureDetector(
+                onTap: () => setState(() {
+                  global.windDirection = "No wind";
+                  print(global.windDirection);
+                  Navigator.pop(context);
+                }),
+                child: SizedBox(
+                    height: MediaQuery.of(context).size.width / 3,
+                    width: MediaQuery.of(context).size.width / 3,
+                    child: const Center(child: Text("No wind"))),
+              ),
+              GestureDetector(
+                onTap: () => setState(() {
+                  global.windDirection = "Left to Right";
+                  print(global.windDirection);
+                  Navigator.pop(context);
+                }),
+                child: SizedBox(
+                    height: MediaQuery.of(context).size.width / 3,
+                    width: MediaQuery.of(context).size.width / 3,
+                    child: const Center(child: Text("Left to Right"))),
+              ),
+            ]),
+            Row(children: [
+              GestureDetector(
+                onTap: () => setState(() {
+                  global.windDirection = "Right to Left Headwind";
+                  print(global.windDirection);
+                  Navigator.pop(context);
+                }),
+                child: SizedBox(
+                    height: MediaQuery.of(context).size.width / 3,
+                    width: MediaQuery.of(context).size.width / 3,
+                    child: const Center(child: Text("Right to Left Headwind"))),
+              ),
+              GestureDetector(
+                onTap: () => setState(() {
+                  global.windDirection = "Headwind";
+                  print(global.windDirection);
+                  Navigator.pop(context);
+                }),
+                child: SizedBox(
+                    height: MediaQuery.of(context).size.width / 3,
+                    width: MediaQuery.of(context).size.width / 3,
+                    child: const Center(child: Text("Headwind"))),
+              ),
+              GestureDetector(
+                onTap: () => setState(() {
+                  global.windDirection = "Left to Right Headwind";
+                  print(global.windDirection);
+                  Navigator.pop(context);
+                }),
+                child: SizedBox(
+                    height: MediaQuery.of(context).size.width / 3,
+                    width: MediaQuery.of(context).size.width / 3,
+                    child: const Center(child: Text("Left to Right Headwind"))),
+              ),
+            ]),
+          ]),
+        ));
+  }
+}
+
 class PuttingSetup extends StatelessWidget {
   const PuttingSetup({Key? key}) : super(key: key);
 
@@ -79,6 +202,34 @@ class PuttingSetup extends StatelessWidget {
       },
       child: ListView(
         children: [
+          const SizedBox(
+            height: 100,
+            child: Center(
+                child: Text(
+              "Wind",
+              textScaleFactor: 1.25,
+            )),
+          ),
+          SizedBox(
+            height: 50,
+            child: Center(
+                child: Text(
+              global.windDirection,
+              textScaleFactor: 1,
+            )),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(150, 20, 150, 20),
+            child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => WindDirectionPicker()));
+                },
+                child: const Text("Change")),
+          ),
+          Divider(),
           SizedBox(
             height: 250,
             child: Column(

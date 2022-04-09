@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'database_helper.dart';
 import 'package:mailer/mailer.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sqflite_common_porter/sqflite_porter.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -73,10 +74,44 @@ class MainAppWidget extends StatelessWidget {
 class PuttingSetup extends StatelessWidget {
   const PuttingSetup({Key? key}) : super(key: key);
 
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
+  }
+
+  Future<File> get _localFile async {
+    final path = await _localPath;
+    return File('$path/databaseExport.csv');
+  }
+
+  Future<File> writeExport(List<String> databaseInfo) async {
+    final file = await _localFile;
+
+    // Write the file
+    return file.writeAsString(databaseInfo.toString());
+  }
+
   Future sendEmail() async {
-    print('pressed button');
-    // GoogleAuthApi.signOut();
-    // return;
+    //Get app documents directory
+    final directory = await getApplicationDocumentsDirectory();
+    //Make local file
+    final file = File('${directory.path}/database.csv');
+
+    final db = await DataBaseHelper.instance.database;
+
+    //I have the path working. Now I just need to figure out how to get the db into a string so I can add it to the csv I've created.
+
+    final dbAsString = dbExportSql(db!).toString();
+
+    final x = await DataBaseHelper.instance.queryAll();
+    print('this is the value of x: $x');
+
+    final export = await file.writeAsString(x.toString());
+    //Write the data to the file
+    //Pass the file as the attachment
+
+    //final exportAsFile = writeExport(export);
+
     final user = await GoogleAuthApi.signIn();
 
     if (user == null) return;
@@ -85,24 +120,17 @@ class PuttingSetup extends StatelessWidget {
     final auth = await user.authentication;
     final token = auth.accessToken;
 
-    print("Authenticated: $email");
-
-    print(Directory.current);
-
     final smtpServer = gmailSaslXoauth2(email, token!);
 
+    // This will sign the user out every time the button is pressed. Remove this line for release.
     GoogleAuthApi.signOut();
+
     final message = Message()
       ..from = Address(email, 'Janne')
-      ..recipients = ['janneo011@gmail.com']
+      ..recipients = [email]
       ..subject = 'Testing 123'
       ..text = 'This is a test email!'
-      ..attachments = [
-        FileAttachment(
-            File("/data/data/com.example.putting_app_v2/files/text.txt"))
-          ..location = Location.attachment
-          ..cid = 'text.txt'
-      ];
+      ..attachments = [FileAttachment(export)..location = Location.attachment];
 
     try {
       await send(message, smtpServer);

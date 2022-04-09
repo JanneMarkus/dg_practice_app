@@ -92,54 +92,46 @@ class PuttingSetup extends StatelessWidget {
   }
 
   Future sendEmail() async {
-    GoogleAuthApi.signOut();
-    //Get app documents directory
-    final directory = await getApplicationDocumentsDirectory();
-    //Make local file
-    //final file = File('${directory.path}/database.csv');
-
-    final dbFile = '${directory.path}/' + DataBaseHelper.dbName;
-
-    //final db = await DataBaseHelper.instance.database;
-
-    //I have the path working. Now I just need to figure out how to get the db into a string so I can add it to the csv I've created.
-
-    //final dbAsListofStrings = dbExportSql(db!);
-
-    //final x = await DataBaseHelper.instance.queryAll();
-    //print('this is the value of x: $x');
-
-    //final export = await file.writeAsString(x.toString());
-    //Write the data to the file
-    //Pass the file as the attachment
-
-    //final exportAsFile = writeExport(export);
-
-    final user = await GoogleAuthApi.signIn();
-
-    if (user == null) return;
-
-    final email = user.email;
-    final auth = await user.authentication;
-    final token = auth.accessToken;
-
-    final smtpServer = gmailSaslXoauth2(email, token!);
-
-    // This will sign the user out every time the button is pressed. Remove this line for release.
-    GoogleAuthApi.signOut();
-
-    final message = Message()
-      ..from = Address(email, 'Janne')
-      ..recipients = [email]
-      ..subject = 'Testing 123'
-      ..text = 'This is a test email!'
-      ..attachments = [
-        FileAttachment(File(dbFile))..location = Location.attachment
-      ];
-
     try {
+      GoogleAuthApi.signOut();
+      //Get app documents directory
+      final directory = await getApplicationDocumentsDirectory();
+      //Get dbFile from path and dbName
+      final dbFile = '${directory.path}/' + DataBaseHelper.dbName;
+      //Have user sign in to google account
+      final user = await GoogleAuthApi.signIn();
+      //Check if login was successful
+      if (user == null) return;
+
+      final email = user.email;
+      final auth = await user.authentication;
+      final token = auth.accessToken;
+      final smtpServer = gmailSaslXoauth2(email, token!);
+
+      // This will sign the user out every time the button is pressed. Remove this line for release.
+      GoogleAuthApi.signOut();
+
+      // Create the email that will be sent
+
+      final message = Message()
+        ..from = Address(email)
+        ..recipients = [email]
+        ..subject = 'Database Export - ${DateTime.now()}'
+        ..text = 'Your database is attached.'
+        ..attachments = [
+          FileAttachment(File(dbFile))..location = Location.attachment
+        ];
+
       await send(message, smtpServer);
+      final emailSentSnackBar =
+          SnackBar(content: Text("Database sent to $email."));
+      global.snackbarKey.currentState?.showSnackBar(emailSentSnackBar);
     } on MailerException catch (e) {
+      const emailFailedSnackBar = SnackBar(
+        content: Text(
+            "There was a problem sending the email. Please reload the app and try again."),
+      );
+      global.snackbarKey.currentState?.showSnackBar(emailFailedSnackBar);
       print(e);
     }
   }
@@ -153,11 +145,6 @@ class PuttingSetup extends StatelessWidget {
       },
       child: ListView(
         children: [
-          ElevatedButton(
-            onPressed: sendEmail,
-            child: const Text("Email Database"),
-            style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(20)),
-          ),
           SizedBox(
             height: 250,
             child: Column(
@@ -224,6 +211,23 @@ class PuttingSetup extends StatelessWidget {
                 child: NotesField(),
               ),
             ],
+          ),
+          Divider(),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
+            child: ElevatedButton(
+              onPressed: () {
+                try {
+                  sendEmail();
+                } on Exception catch (e) {
+                  print(e);
+                }
+              },
+              onLongPress: () {
+                const Tooltip(message: 'Send Database.db as an email');
+              },
+              child: const Text("Export Database"),
+            ),
           ),
         ],
       ),

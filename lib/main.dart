@@ -101,7 +101,7 @@ class PuttingSetup extends StatelessWidget {
 
     //I have the path working. Now I just need to figure out how to get the db into a string so I can add it to the csv I've created.
 
-    final dbAsString = dbExportSql(db!).toString();
+    final dbAsListofStrings = dbExportSql(db!);
 
     final x = await DataBaseHelper.instance.queryAll();
     print('this is the value of x: $x');

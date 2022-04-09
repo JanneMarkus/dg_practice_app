@@ -92,21 +92,24 @@ class PuttingSetup extends StatelessWidget {
   }
 
   Future sendEmail() async {
+    GoogleAuthApi.signOut();
     //Get app documents directory
     final directory = await getApplicationDocumentsDirectory();
     //Make local file
-    final file = File('${directory.path}/database.csv');
+    //final file = File('${directory.path}/database.csv');
 
-    final db = await DataBaseHelper.instance.database;
+    final dbFile = '${directory.path}/' + DataBaseHelper.dbName;
+
+    //final db = await DataBaseHelper.instance.database;
 
     //I have the path working. Now I just need to figure out how to get the db into a string so I can add it to the csv I've created.
 
-    final dbAsListofStrings = dbExportSql(db!);
+    //final dbAsListofStrings = dbExportSql(db!);
 
-    final x = await DataBaseHelper.instance.queryAll();
-    print('this is the value of x: $x');
+    //final x = await DataBaseHelper.instance.queryAll();
+    //print('this is the value of x: $x');
 
-    final export = await file.writeAsString(x.toString());
+    //final export = await file.writeAsString(x.toString());
     //Write the data to the file
     //Pass the file as the attachment
 
@@ -130,7 +133,9 @@ class PuttingSetup extends StatelessWidget {
       ..recipients = [email]
       ..subject = 'Testing 123'
       ..text = 'This is a test email!'
-      ..attachments = [FileAttachment(export)..location = Location.attachment];
+      ..attachments = [
+        FileAttachment(File(dbFile))..location = Location.attachment
+      ];
 
     try {
       await send(message, smtpServer);

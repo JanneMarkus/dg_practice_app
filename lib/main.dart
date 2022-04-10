@@ -7,7 +7,6 @@ import 'package:path_provider/path_provider.dart';
 import 'database_helper.dart';
 import 'package:mailer/mailer.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:sqflite_common_porter/sqflite_porter.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -74,6 +73,7 @@ class MainAppWidget extends StatelessWidget {
 class PuttingSetup extends StatelessWidget {
   const PuttingSetup({Key? key}) : super(key: key);
 
+  // Setup Functions for sending database via email
   Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
     return directory.path;
@@ -109,7 +109,7 @@ class PuttingSetup extends StatelessWidget {
       final smtpServer = gmailSaslXoauth2(email, token!);
 
       // This will sign the user out every time the button is pressed. Remove this line for release.
-      GoogleAuthApi.signOut();
+      //GoogleAuthApi.signOut();
 
       // Create the email that will be sent
 
@@ -212,7 +212,7 @@ class PuttingSetup extends StatelessWidget {
               ),
             ],
           ),
-          Divider(),
+          const Divider(),
           Padding(
             padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
             child: ElevatedButton(

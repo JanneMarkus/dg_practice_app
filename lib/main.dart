@@ -1,9 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:mailer/smtp_server/gmail.dart';
 import 'global.dart' as global;
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'database_helper.dart';
+import 'package:mailer/mailer.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sqflite_common_porter/sqflite_porter.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -69,6 +73,68 @@ class MainAppWidget extends StatelessWidget {
 
 class PuttingSetup extends StatelessWidget {
   const PuttingSetup({Key? key}) : super(key: key);
+
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
+  }
+
+  Future<File> get _localFile async {
+    final path = await _localPath;
+    return File('$path/databaseExport.csv');
+  }
+
+  Future<File> writeExport(List<String> databaseInfo) async {
+    final file = await _localFile;
+
+    // Write the file
+    return file.writeAsString(databaseInfo.toString());
+  }
+
+  Future sendEmail() async {
+    try {
+      GoogleAuthApi.signOut();
+      //Get app documents directory
+      final directory = await getApplicationDocumentsDirectory();
+      //Get dbFile from path and dbName
+      final dbFile = '${directory.path}/' + DataBaseHelper.dbName;
+      //Have user sign in to google account
+      final user = await GoogleAuthApi.signIn();
+      //Check if login was successful
+      if (user == null) return;
+
+      final email = user.email;
+      final auth = await user.authentication;
+      final token = auth.accessToken;
+      final smtpServer = gmailSaslXoauth2(email, token!);
+
+      // This will sign the user out every time the button is pressed. Remove this line for release.
+      GoogleAuthApi.signOut();
+
+      // Create the email that will be sent
+
+      final message = Message()
+        ..from = Address(email)
+        ..recipients = [email]
+        ..subject = 'Database Export - ${DateTime.now()}'
+        ..text = 'Your database is attached.'
+        ..attachments = [
+          FileAttachment(File(dbFile))..location = Location.attachment
+        ];
+
+      await send(message, smtpServer);
+      final emailSentSnackBar =
+          SnackBar(content: Text("Database sent to $email."));
+      global.snackbarKey.currentState?.showSnackBar(emailSentSnackBar);
+    } on MailerException catch (e) {
+      const emailFailedSnackBar = SnackBar(
+        content: Text(
+            "There was a problem sending the email. Please reload the app and try again."),
+      );
+      global.snackbarKey.currentState?.showSnackBar(emailFailedSnackBar);
+      print(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -146,10 +212,42 @@ class PuttingSetup extends StatelessWidget {
               ),
             ],
           ),
+          Divider(),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
+            child: ElevatedButton(
+              onPressed: () {
+                try {
+                  sendEmail();
+                } on Exception catch (e) {
+                  print(e);
+                }
+              },
+              onLongPress: () {
+                const Tooltip(message: 'Send Database.db as an email');
+              },
+              child: const Text("Export Database"),
+            ),
+          ),
         ],
       ),
     );
   }
+}
+
+class GoogleAuthApi {
+  static final _googleSignIn =
+      GoogleSignIn(scopes: ['https://mail.google.com/']);
+
+  static Future<GoogleSignInAccount?> signIn() async {
+    if (await _googleSignIn.isSignedIn()) {
+      return _googleSignIn.currentUser;
+    } else {
+      return await _googleSignIn.signIn();
+    }
+  }
+
+  static Future signOut() => _googleSignIn.signOut();
 }
 
 class NotesField extends StatefulWidget {

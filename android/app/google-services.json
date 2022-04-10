@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "272016534693",
+    "project_id": "signin-dfc0d",
+    "storage_bucket": "signin-dfc0d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:272016534693:android:2e8440e57eca91106df14c",
+        "android_client_info": {
+          "package_name": "com.example.putting_app_v2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "272016534693-5svrhij4sfnk3bf0qibp66t82a4sfist.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCAYO_hq0eBsaNn8YQ6yi-kFsIN3NyoRF0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "272016534693-5svrhij4sfnk3bf0qibp66t82a4sfist.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

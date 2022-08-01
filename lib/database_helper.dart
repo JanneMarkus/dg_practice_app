@@ -18,9 +18,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DataBaseHelper {
-  static const _dbName = "version3.db";
-  static const _dbVersion = 2;
-  static const _tableName = "myTable";
+  static const _dbName = "dg_practice_database.db";
+  static const _dbVersion = 1;
+  static const _tableName = "puttingTable";
   static const dbName = _dbName;
 
   static const columnId = "_id";

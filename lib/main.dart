@@ -7,7 +7,6 @@ import 'package:path_provider/path_provider.dart';
 import 'database_helper.dart';
 import 'package:mailer/mailer.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -1031,7 +1030,7 @@ class _ApproachCounterState extends State<ApproachCounterState> {
                         action: SnackBarAction(
                           label: 'Undo',
                           onPressed: () async {
-                            await DataBaseHelper.instance.delete(i);
+                            await ApproachDataBaseHelper.instance.delete(i);
                             setState(() {
                               global.appCount = currentCount;
                               global.appMakes = currentMakes;

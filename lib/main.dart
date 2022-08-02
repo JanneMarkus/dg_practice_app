@@ -7,6 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'database_helper.dart';
 import 'package:mailer/mailer.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         title: _title,
         scaffoldMessengerKey: global.snackbarKey,
-        home: const MainAppWidget(),
+        home: const PuttingWidget(),
         theme: ThemeData(
           brightness: Brightness.dark,
           primarySwatch: accentColor,
@@ -31,8 +32,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MainAppWidget extends StatelessWidget {
-  const MainAppWidget({Key? key}) : super(key: key);
+class PuttingWidget extends StatelessWidget {
+  const PuttingWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +42,8 @@ class MainAppWidget extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          toolbarHeight: 0,
+          title: const Text("Putting Practice"),
+          toolbarHeight: 50,
           bottom: const TabBar(
             indicatorColor: Colors.pink,
             tabs: <Widget>[
@@ -54,6 +56,7 @@ class MainAppWidget extends StatelessWidget {
             ],
           ),
         ),
+        drawer: const NavigationDrawer(),
         body: const TabBarView(
           physics: NeverScrollableScrollPhysics(),
           children: <Widget>[
@@ -68,6 +71,84 @@ class MainAppWidget extends StatelessWidget {
       ),
     );
   }
+}
+
+class ApproachWidget extends StatelessWidget {
+  const ApproachWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      initialIndex: global.startTab,
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Approach Practice"),
+          toolbarHeight: 50,
+          bottom: const TabBar(
+            indicatorColor: Colors.pink,
+            tabs: <Widget>[
+              Tab(
+                icon: Text('Setup'),
+              ),
+              Tab(
+                icon: Text('Throw'),
+              ),
+            ],
+          ),
+        ),
+        drawer: const NavigationDrawer(),
+        body: const TabBarView(
+          physics: NeverScrollableScrollPhysics(),
+          children: <Widget>[
+            Center(
+              child: PuttingSetup(),
+            ),
+            Center(
+              child: ApproachCounter(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class NavigationDrawer extends StatelessWidget {
+  const NavigationDrawer({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) => Drawer(
+          child: SingleChildScrollView(
+              child: Container(
+        padding: const EdgeInsets.fromLTRB(0, 75, 0, 0),
+        child: Wrap(
+          runSpacing: 16,
+          children: [
+            ListTile(
+              title: const Text("Putting"),
+              onTap: () {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => const PuttingWidget()));
+              },
+            ),
+            ListTile(
+                title: const Text("Approach"),
+                onTap: () {
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => const ApproachWidget()));
+                }),
+            ListTile(
+              title: const Text("Long Throws"),
+              onTap: () {},
+            ),
+            ListTile(
+              title: const Text("Utility Shots"),
+              onTap: () {},
+            )
+          ],
+        ),
+      )));
 }
 
 class PuttingSetup extends StatelessWidget {
@@ -657,6 +738,13 @@ class _ShotsMadeState extends State<ShotsMade> {
   }
 }
 
+class CustomPageRoute extends MaterialPageRoute {
+  CustomPageRoute({builder}) : super(builder: builder);
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 0);
+}
+
 //
 // This is where the putting counter code goes
 //
@@ -667,13 +755,6 @@ class PuttingCounter extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Counter();
   }
-}
-
-class CustomPageRoute extends MaterialPageRoute {
-  CustomPageRoute({builder}) : super(builder: builder);
-
-  @override
-  Duration get transitionDuration => const Duration(milliseconds: 0);
 }
 
 class Counter extends StatefulWidget {
@@ -798,6 +879,164 @@ class _CounterState extends State<Counter> {
                               global.makes = currentMakes;
                               global.notes = currentNotes;
                               if (global.count >= global.goal) {
+                                global.backgroundColor = global.green;
+                              } else {
+                                global.backgroundColor = Colors.transparent;
+                              }
+                            });
+                            final deleteSnackBar = SnackBar(
+                              content: Text("Deleted session $i"),
+                            );
+                            global.snackbarKey.currentState
+                                ?.showSnackBar(deleteSnackBar);
+                          },
+                          //
+                        ));
+                    global.snackbarKey.currentState?.showSnackBar(snackBar);
+                  }),
+      ])
+    ]);
+  }
+}
+
+//
+// This is where the approach counter code goes
+//
+class ApproachCounter extends StatelessWidget {
+  const ApproachCounter({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const ApproachCounterState();
+  }
+}
+
+class ApproachCounterState extends StatefulWidget {
+  const ApproachCounterState({Key? key}) : super(key: key);
+  @override
+  _ApproachCounterState createState() => _ApproachCounterState();
+}
+
+// add a cache feature for the makes so that when I press the back button, the previously
+// selected makes is subtracted from the makes count.
+
+class _ApproachCounterState extends State<ApproachCounterState> {
+  var appStackSize = global.appStackSize;
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [
+      LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+        return Row(children: [
+          GestureDetector(
+              onLongPress: () {
+                final makesSnackBar = SnackBar(
+                    content: Text(
+                        "${global.makes}/${global.count} - Accuracy: ${((global.makes / global.count) * 100).truncate()}%"));
+                global.snackbarKey.currentState?.showSnackBar(makesSnackBar);
+              },
+              onTap: () => setState(() {
+                    if (global.appCount - appStackSize <= 0) {
+                      global.appMakes = 0;
+                      global.appCount = 0;
+                    } else {
+                      global.appCount = global.appCount - appStackSize;
+                      global.appMakes -= global.appPreviousMake;
+                    }
+                    if (global.appCount >= global.appGoal) {
+                      global.backgroundColor = global.green;
+                    } else {
+                      global.backgroundColor = Colors.transparent;
+                    }
+                  }),
+              child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                      height: constraints.maxHeight,
+                      width: (MediaQuery.of(context).size.width / 2),
+                      color: global.backgroundColor))),
+          GestureDetector(
+              onLongPress: () {
+                final makesSnackBar = SnackBar(
+                    content: Text(
+                        "${global.appMakes}/${global.appCount} - Accuracy: ${(global.appMakes / global.appCount) * 100.round()}%"));
+                global.snackbarKey.currentState?.showSnackBar(makesSnackBar);
+              },
+              onTap: () => setState(() {
+                    Navigator.push(
+                        context,
+                        CustomPageRoute(
+                            builder: (context) => const ShotsMade()));
+                    global.appCount = global.appCount + appStackSize;
+                    if (global.appCount >= global.appGoal) {
+                      global.backgroundColor = global.green;
+                    } else {
+                      global.backgroundColor = Colors.transparent;
+                    }
+                  }),
+              child: Align(
+                  alignment: Alignment.topRight,
+                  child: Container(
+                      height: constraints.maxHeight,
+                      width: (MediaQuery.of(context).size.width / 2),
+                      color: global.backgroundColor))),
+        ]);
+      }),
+      Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+        Center(
+            child: IgnorePointer(
+                child: Text(
+          "${global.appCount}",
+          textScaleFactor: 10,
+        ))),
+        ElevatedButton(
+            child: const Text(
+              "Log Session",
+              textScaleFactor: 2,
+            ),
+            style: null,
+            onPressed: global.appCount == 0
+                ? null
+                : () async {
+                    final currentCount = global.appCount;
+                    final currentMakes = global.appMakes;
+                    final currentNotes = global.appNotes;
+                    int? i = await ApproachDataBaseHelper.instance.insert({
+                      ApproachDataBaseHelper.columnName: global.appName,
+                      ApproachDataBaseHelper.columnDate:
+                          DateTime.now().toString(),
+                      ApproachDataBaseHelper.columnThrows: global.appCount,
+                      ApproachDataBaseHelper.columnMakes: global.appMakes,
+                      ApproachDataBaseHelper.columnShotType: global.appShotType,
+                      ApproachDataBaseHelper.columnDistance: global.appDistance,
+                      ApproachDataBaseHelper.columnTargetSize:
+                          global.appTargetSize,
+                      ApproachDataBaseHelper.columnStackSize:
+                          global.appStackSize,
+                      ApproachDataBaseHelper.columnStance: global.appStance,
+                      ApproachDataBaseHelper.columnNotes: global.appNotes,
+                    });
+
+                    setState(() {
+                      global.appMakes = 0;
+                      global.appCount = 0;
+                      global.appNotes = "";
+                      global.backgroundColor = Colors.transparent;
+                    });
+                    final snackBar = SnackBar(
+                        content: Text(
+                            "Logged session $i to database:\n\nYou made $currentMakes of $currentCount ${global.appShotType == 0 ? "hyzer" : (global.appShotType == 1 ? "flat" : "anhyzer")} throws from ${global.appDistance} feet."),
+
+                        // Undo Session Log
+                        action: SnackBarAction(
+                          label: 'Undo',
+                          onPressed: () async {
+                            await DataBaseHelper.instance.delete(i);
+                            setState(() {
+                              global.appCount = currentCount;
+                              global.appMakes = currentMakes;
+                              global.appNotes = currentNotes;
+                              if (global.appCount >= global.appGoal) {
                                 global.backgroundColor = global.green;
                               } else {
                                 global.backgroundColor = Colors.transparent;

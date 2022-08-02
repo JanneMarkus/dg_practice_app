@@ -19,3 +19,19 @@ var notes = "";
 
 final GlobalKey<ScaffoldMessengerState> snackbarKey =
     GlobalKey<ScaffoldMessengerState>();
+
+//values for approach shots
+var appCount = 0;
+var appName = "Janne";
+var appMakes = 0;
+var appPreviousMake = 0;
+var appStackSize = 5;
+var appDistance = 15;
+var appTargetSize = 15;
+var appShotType = 1;
+var appStance = '';
+var appGoal = 100;
+var appDate = "";
+var appStartTab = 0;
+var appTable = [];
+var appNotes = "";

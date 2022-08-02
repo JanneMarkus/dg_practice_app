@@ -19,7 +19,7 @@ import 'package:sqflite/sqflite.dart';
 
 class DataBaseHelper {
   // This is for putting data
-  static const _dbName = "test.db";
+  static const _dbName = "test3.db";
   static const _dbVersion = 1;
   static const _puttingTableName = "puttingTable";
   static const _approachTableName = "approachTable";
@@ -68,7 +68,7 @@ class DataBaseHelper {
     $columnMakes INTEGER,
     $columnStackSize INTEGER,
     $columnStance TEXT,
-    $columnNotes TEXT),
+    $columnNotes TEXT);
     CREATE TABLE $_approachTableName (
     $columnId INTEGER PRIMARY KEY,
     $columnName TEXT,
@@ -80,8 +80,7 @@ class DataBaseHelper {
     $columnMakes INTEGER,
     $columnStackSize INTEGER,
     $columnStance TEXT,
-    $columnNotes TEXT)
-    )
+    $columnNotes TEXT);
     ''');
 
   Future<int> insert(Map<String, dynamic> row) async {
@@ -114,7 +113,7 @@ class DataBaseHelper {
 
 class ApproachDataBaseHelper {
   // This is for approach data
-  static const _dbName = "test.db";
+  static const _dbName = "test3.db";
   static const _dbVersion = 1;
   static const _puttingTableName = "puttingTable";
   static const _approachTableName = "approachTable";
@@ -164,7 +163,7 @@ class ApproachDataBaseHelper {
     $columnMakes INTEGER,
     $columnStackSize INTEGER,
     $columnStance TEXT,
-    $columnNotes TEXT),
+    $columnNotes TEXT);
     CREATE TABLE $_approachTableName (
     $columnId INTEGER PRIMARY KEY,
     $columnName TEXT,
@@ -176,8 +175,7 @@ class ApproachDataBaseHelper {
     $columnMakes INTEGER,
     $columnStackSize INTEGER,
     $columnStance TEXT,
-    $columnNotes TEXT)
-    )
+    $columnNotes TEXT);
     ''');
 
   Future<int> insert(Map<String, dynamic> row) async {

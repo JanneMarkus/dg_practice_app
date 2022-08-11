@@ -19,7 +19,7 @@ import 'package:sqflite/sqflite.dart';
 
 class DataBaseHelper {
   // This is for putting data
-  static const _dbName = "test3.db";
+  static const _dbName = "test6.db";
   static const _dbVersion = 1;
   static const _puttingTableName = "puttingTable";
   static const _approachTableName = "approachTable";
@@ -57,7 +57,8 @@ class DataBaseHelper {
     return await openDatabase(path, version: _dbVersion, onCreate: _onCreate);
   }
 
-  Future _onCreate(Database db, int version) => db.execute('''
+  Future _onCreate(Database db, int version) async {
+    db.execute('''
     CREATE TABLE $_puttingTableName (
     $columnId INTEGER PRIMARY KEY,
     $columnName TEXT,
@@ -68,7 +69,8 @@ class DataBaseHelper {
     $columnMakes INTEGER,
     $columnStackSize INTEGER,
     $columnStance TEXT,
-    $columnNotes TEXT);
+    $columnNotes TEXT);''');
+    db.execute('''
     CREATE TABLE $_approachTableName (
     $columnId INTEGER PRIMARY KEY,
     $columnName TEXT,
@@ -82,6 +84,7 @@ class DataBaseHelper {
     $columnStance TEXT,
     $columnNotes TEXT);
     ''');
+  }
 
   Future<int> insert(Map<String, dynamic> row) async {
     Database? db = await instance.database;
@@ -113,7 +116,7 @@ class DataBaseHelper {
 
 class ApproachDataBaseHelper {
   // This is for approach data
-  static const _dbName = "test3.db";
+  static const _dbName = "test6.db";
   static const _dbVersion = 1;
   static const _puttingTableName = "puttingTable";
   static const _approachTableName = "approachTable";
@@ -152,7 +155,8 @@ class ApproachDataBaseHelper {
     return await openDatabase(path, version: _dbVersion, onCreate: _onCreate);
   }
 
-  Future _onCreate(Database db, int version) => db.execute('''
+  Future _onCreate(Database db, int version) async {
+    db.execute('''
     CREATE TABLE $_puttingTableName (
     $columnId INTEGER PRIMARY KEY,
     $columnName TEXT,
@@ -163,7 +167,8 @@ class ApproachDataBaseHelper {
     $columnMakes INTEGER,
     $columnStackSize INTEGER,
     $columnStance TEXT,
-    $columnNotes TEXT);
+    $columnNotes TEXT);''');
+    db.execute('''
     CREATE TABLE $_approachTableName (
     $columnId INTEGER PRIMARY KEY,
     $columnName TEXT,
@@ -177,6 +182,7 @@ class ApproachDataBaseHelper {
     $columnStance TEXT,
     $columnNotes TEXT);
     ''');
+  }
 
   Future<int> insert(Map<String, dynamic> row) async {
     Database? db = await instance.database;

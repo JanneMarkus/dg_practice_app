@@ -26,7 +26,35 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
-const databaseName = "databaseTesting.db";
+const databaseName = "profileBuild08102022.db";
+
+const puttingTableCreate = """
+    CREATE TABLE puttingTable (
+    _id INTEGER PRIMARY KEY,
+    name TEXT,
+    date TEXT,
+    shotType TEXT,
+    distance INTEGER,
+    throws INTEGER,
+    makes INTEGER,
+    stackSize INTEGER,
+    stance TEXT,
+    notes TEXT);""";
+
+const approachTableCreate = """
+    CREATE TABLE approachTable (
+    _id INTEGER PRIMARY KEY,
+    name TEXT,
+    date TEXT,
+    shotType TEXT,
+    distance INTEGER,
+    targetSize INTEGER,
+    throws INTEGER,
+    makes INTEGER,
+    stackSize INTEGER,
+    stance TEXT,
+    notes TEXT);
+    """;
 
 class DataBaseHelper {
   // This is for putting data
@@ -69,32 +97,8 @@ class DataBaseHelper {
   }
 
   Future _onCreate(Database db, int version) async {
-    db.execute('''
-    CREATE TABLE $_puttingTableName (
-    $columnId INTEGER PRIMARY KEY,
-    $columnName TEXT,
-    $columnDate TEXT,
-    $columnShotType TEXT,
-    $columnDistance INTEGER,
-    $columnThrows INTEGER,
-    $columnMakes INTEGER,
-    $columnStackSize INTEGER,
-    $columnStance TEXT,
-    $columnNotes TEXT);''');
-    db.execute('''
-    CREATE TABLE $_approachTableName (
-    $columnId INTEGER PRIMARY KEY,
-    $columnName TEXT,
-    $columnDate TEXT,
-    $columnShotType TEXT,
-    $columnDistance INTEGER,
-    $columnTargetSize INTEGER,
-    $columnThrows INTEGER,
-    $columnMakes INTEGER,
-    $columnStackSize INTEGER,
-    $columnStance TEXT,
-    $columnNotes TEXT);
-    ''');
+    db.execute(puttingTableCreate);
+    db.execute(approachTableCreate);
   }
 
   Future<int> insert(Map<String, dynamic> row) async {
@@ -167,32 +171,8 @@ class ApproachDataBaseHelper {
   }
 
   Future _onCreate(Database db, int version) async {
-    db.execute('''
-    CREATE TABLE $_puttingTableName (
-    $columnId INTEGER PRIMARY KEY,
-    $columnName TEXT,
-    $columnDate TEXT,
-    $columnShotType TEXT,
-    $columnDistance INTEGER,
-    $columnThrows INTEGER,
-    $columnMakes INTEGER,
-    $columnStackSize INTEGER,
-    $columnStance TEXT,
-    $columnNotes TEXT);''');
-    db.execute('''
-    CREATE TABLE $_approachTableName (
-    $columnId INTEGER PRIMARY KEY,
-    $columnName TEXT,
-    $columnDate TEXT,
-    $columnShotType TEXT,
-    $columnDistance INTEGER,
-    $columnTargetSize INTEGER,
-    $columnThrows INTEGER,
-    $columnMakes INTEGER,
-    $columnStackSize INTEGER,
-    $columnStance TEXT,
-    $columnNotes TEXT);
-    ''');
+    db.execute(puttingTableCreate);
+    db.execute(approachTableCreate);
   }
 
   Future<int> insert(Map<String, dynamic> row) async {

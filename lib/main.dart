@@ -101,7 +101,7 @@ class ApproachWidget extends StatelessWidget {
           physics: NeverScrollableScrollPhysics(),
           children: <Widget>[
             Center(
-              child: PuttingSetup(),
+              child: ApproachSetup(),
             ),
             Center(
               child: ApproachCounter(),
@@ -137,14 +137,14 @@ class NavigationDrawer extends StatelessWidget {
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
                       builder: (context) => const ApproachWidget()));
                 }),
-            ListTile(
-              title: const Text("Long Throws"),
-              onTap: () {},
-            ),
-            ListTile(
-              title: const Text("Utility Shots"),
-              onTap: () {},
-            )
+            // ListTile(
+            //   title: const Text("Long Throws"),
+            //   onTap: () {},
+            // ),
+            // ListTile(
+            //   title: const Text("Utility Shots"),
+            //   onTap: () {},
+            // )
           ],
         ),
       )));
@@ -315,6 +315,188 @@ class PuttingSetup extends StatelessWidget {
   }
 }
 
+class ApproachSetup extends StatelessWidget {
+  const ApproachSetup({Key? key}) : super(key: key);
+
+  // Setup Functions for sending database via email
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
+  }
+
+  Future<File> get _localFile async {
+    final path = await _localPath;
+    return File('$path/databaseExport.csv');
+  }
+
+  Future<File> writeExport(List<String> databaseInfo) async {
+    final file = await _localFile;
+
+    // Write the file
+    return file.writeAsString(databaseInfo.toString());
+  }
+
+  Future sendEmail() async {
+    try {
+      GoogleAuthApi.signOut();
+      //Get app documents directory
+      final directory = await getApplicationDocumentsDirectory();
+      //Get dbFile from path and dbName
+      final dbFile = '${directory.path}/' + DataBaseHelper.dbName;
+      //Have user sign in to google account
+      final user = await GoogleAuthApi.signIn();
+      //Check if login was successful
+      if (user == null) return;
+
+      final email = user.email;
+      final auth = await user.authentication;
+      final token = auth.accessToken;
+      final smtpServer = gmailSaslXoauth2(email, token!);
+
+      // This will sign the user out every time the button is pressed. Remove this line for release.
+      //GoogleAuthApi.signOut();
+
+      // Create the email that will be sent
+
+      final message = Message()
+        ..from = Address(email)
+        ..recipients = [email]
+        ..subject = 'Database Export - ${DateTime.now()}'
+        ..text = 'Your database is attached.'
+        ..attachments = [
+          FileAttachment(File(dbFile))..location = Location.attachment
+        ];
+
+      await send(message, smtpServer);
+      final emailSentSnackBar =
+          SnackBar(content: Text("Database sent to $email."));
+      global.snackbarKey.currentState?.showSnackBar(emailSentSnackBar);
+    } on MailerException catch (e) {
+      const emailFailedSnackBar = SnackBar(
+        content: Text(
+            "There was a problem sending the email. Please reload the app and try again."),
+      );
+      global.snackbarKey.currentState?.showSnackBar(emailFailedSnackBar);
+      print(e);
+    }
+  }
+
+  // Build approach setup page
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+        TextEditingController().clear();
+      },
+      child: ListView(
+        children: [
+          SizedBox(
+            height: 250,
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  const Center(
+                      child: Text(
+                    "Stance",
+                    textScaleFactor: 1.25,
+                  )),
+                  _StanceSelectorChip()
+                ]),
+          ),
+          const Divider(),
+          SizedBox(
+            height: 200,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                const Center(
+                    child: Text(
+                  "Shot Type",
+                  textScaleFactor: 1.25,
+                )),
+                _ShotTypeSelectorChip(),
+              ],
+            ),
+          ),
+          const Divider(),
+          SizedBox(
+            height: 250,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: const [
+                Center(
+                    child: Text(
+                  "# of Discs",
+                  textScaleFactor: 1.25,
+                )),
+                StackSizeSliders(),
+              ],
+            ),
+          ),
+          const Divider(),
+          SizedBox(
+            height: 250,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: const [
+                Center(
+                    child: Text(
+                  "Distance To Basket (ft)",
+                  textScaleFactor: 1.25,
+                )),
+                DistanceSliders(),
+              ],
+            ),
+          ),
+          const Divider(),
+          SizedBox(
+            height: 250,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: const [
+                Center(
+                    child: Text(
+                  "Size Of Target (ft)",
+                  textScaleFactor: 1.25,
+                )),
+                TargetSizeSliders(),
+              ],
+            ),
+          ),
+          const Divider(),
+          Column(
+            children: const [
+              Padding(
+                padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                child: NotesField(),
+              ),
+            ],
+          ),
+          const Divider(),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
+            child: ElevatedButton(
+              onPressed: () {
+                try {
+                  sendEmail();
+                } on Exception catch (e) {
+                  print(e);
+                }
+              },
+              onLongPress: () {
+                const Tooltip(message: 'Send Database.db as an email');
+              },
+              child: const Text("Export Database"),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class GoogleAuthApi {
   static final _googleSignIn =
       GoogleSignIn(scopes: ['https://mail.google.com/']);
@@ -437,7 +619,7 @@ class _ShotTypeSelectorChipState extends State<_ShotTypeSelectorChip>
   }
 }
 
-// Stance Selector
+// Stance Selector Chip
 
 class _StanceSelectorChip extends StatefulWidget {
   @override
@@ -665,8 +847,8 @@ class DistanceSlidersState extends State<DistanceSliders>
                           newValue != _continuousValue.value) {
                         setState(() {
                           _continuousValue.value =
-                              newValue.clamp(0, 100).truncate();
-                          global.distance = newValue.clamp(0, 100).toInt();
+                              newValue.clamp(0, 300).truncate();
+                          global.distance = newValue.clamp(0, 300).toInt();
                         });
                       }
                     },
@@ -680,11 +862,90 @@ class DistanceSlidersState extends State<DistanceSliders>
               Slider(
                 value: _continuousValue.value.toDouble(),
                 min: 0,
-                max: 100,
+                max: 300,
                 onChanged: (value) {
                   setState(() {
                     _continuousValue.value = value.toInt();
                     global.distance = value.toInt();
+                  });
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// TargetSize Sliders
+class TargetSizeSliders extends StatefulWidget {
+  const TargetSizeSliders({Key? key}) : super(key: key);
+
+  @override
+  TargetSizeSlidersState createState() => TargetSizeSlidersState();
+}
+
+class TargetSizeSlidersState extends State<TargetSizeSliders>
+    with RestorationMixin {
+  final RestorableInt _continuousValue = RestorableInt(global.appTargetSize);
+
+  @override
+  String get restorationId => 'TargetSize_slider';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_continuousValue, 'continuous_value');
+  }
+
+  @override
+  void dispose() {
+    _continuousValue.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Semantics(
+                child: SizedBox(
+                  width: 64,
+                  height: 48,
+                  child: TextField(
+                    textAlign: TextAlign.center,
+                    onSubmitted: (value) {
+                      final newValue = int.tryParse(value);
+                      if (newValue != null &&
+                          newValue != _continuousValue.value) {
+                        setState(() {
+                          _continuousValue.value =
+                              newValue.clamp(0, 50).truncate();
+                          global.appTargetSize = newValue.clamp(0, 50).toInt();
+                        });
+                      }
+                    },
+                    keyboardType: TextInputType.number,
+                    controller: TextEditingController(
+                      text: _continuousValue.value.toStringAsFixed(0),
+                    ),
+                  ),
+                ),
+              ),
+              Slider(
+                value: _continuousValue.value.toDouble(),
+                min: 0,
+                max: 50,
+                onChanged: (value) {
+                  setState(() {
+                    _continuousValue.value = value.toInt();
+                    global.appTargetSize = value.toInt();
                   });
                 },
               ),
@@ -737,6 +998,47 @@ class _ShotsMadeState extends State<ShotsMade> {
   }
 }
 
+class AppShotsMade extends StatefulWidget {
+  const AppShotsMade({Key? key}) : super(key: key);
+  @override
+  State<AppShotsMade> createState() => _AppShotsMadeState();
+}
+
+class _AppShotsMadeState extends State<AppShotsMade> {
+  @override
+  Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
+    return Scaffold(
+      appBar: AppBar(title: const Text("Made throws")),
+      body: SafeArea(
+        top: false,
+        child: ListView.builder(
+            reverse: true,
+            itemBuilder: (context, int index) => SizedBox(
+                height: (height) / 7,
+                child: GestureDetector(
+                  onTap: () => {
+                    global.appMakes += index,
+                    global.appPreviousMake = index,
+                    print(global.appMakes),
+                    Navigator.pop(context)
+                  },
+                  child: Container(
+                    color: Color.fromARGB(
+                        (255 / global.appStackSize * index).ceil(), 200, 0, 0),
+                    child: Center(
+                        child: Text(
+                      (index).toString(),
+                      textScaleFactor: 5,
+                    )),
+                  ),
+                )),
+            itemCount: global.appStackSize + 1),
+      ),
+    );
+  }
+}
+
 class CustomPageRoute extends MaterialPageRoute {
   CustomPageRoute({builder}) : super(builder: builder);
 
@@ -761,9 +1063,6 @@ class Counter extends StatefulWidget {
   @override
   _CounterState createState() => _CounterState();
 }
-
-// add a cache feature for the makes so that when I press the back button, the previously
-// selected makes is subtracted from the makes count.
 
 class _CounterState extends State<Counter> {
   var stackSize = global.stackSize;
@@ -916,9 +1215,6 @@ class ApproachCounterState extends StatefulWidget {
   _ApproachCounterState createState() => _ApproachCounterState();
 }
 
-// add a cache feature for the makes so that when I press the back button, the previously
-// selected makes is subtracted from the makes count.
-
 class _ApproachCounterState extends State<ApproachCounterState> {
   var appStackSize = global.appStackSize;
   @override
@@ -965,7 +1261,7 @@ class _ApproachCounterState extends State<ApproachCounterState> {
                     Navigator.push(
                         context,
                         CustomPageRoute(
-                            builder: (context) => const ShotsMade()));
+                            builder: (context) => const AppShotsMade()));
                     global.appCount = global.appCount + appStackSize;
                     if (global.appCount >= global.appGoal) {
                       global.backgroundColor = global.green;

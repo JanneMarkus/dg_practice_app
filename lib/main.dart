@@ -866,7 +866,7 @@ class _CounterState extends State<Counter> {
                     });
                     final snackBar = SnackBar(
                         content: Text(
-                            "Logged session $i to database:\n\nYou made $currentMakes of $currentCount ${global.shotType == 0 ? "hyzer" : (global.shotType == 1 ? "flat" : "anhyzer")} throws from ${global.distance} feet."),
+                            "Logged session $i to putting table:\n\nYou made $currentMakes of $currentCount ${global.shotType == 0 ? "hyzer" : (global.shotType == 1 ? "flat" : "anhyzer")} throws from ${global.distance} feet."),
 
                         // Undo Session Log
                         action: SnackBarAction(
@@ -1024,7 +1024,7 @@ class _ApproachCounterState extends State<ApproachCounterState> {
                     });
                     final snackBar = SnackBar(
                         content: Text(
-                            "Logged session $i to database:\n\nYou made $currentMakes of $currentCount ${global.appShotType == 0 ? "hyzer" : (global.appShotType == 1 ? "flat" : "anhyzer")} throws from ${global.appDistance} feet."),
+                            "Logged session $i to approach table:\n\nYou made $currentMakes of $currentCount ${global.appShotType == 0 ? "hyzer" : (global.appShotType == 1 ? "flat" : "anhyzer")} throws from ${global.appDistance} feet."),
 
                         // Undo Session Log
                         action: SnackBarAction(

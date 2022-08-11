@@ -10,6 +10,15 @@
 // A putter stack size column
 // This video shows how to access the databases on the emulator https://www.youtube.com/watch?v=GZfFRv9VWtU&t=396s
 
+// This code is SUPER messy.
+// I have it so that if no DB exists, and the user tries to enter data to db, it will create a new db.
+// But I had to copy the EXACT same code for the approach table,
+// because if the person tried to enter data to that table first, the db wouldn't exist otherwise..
+// In a perfect world, I would have the create function reference a higher level function
+// that has the SQL command for creating all the tables that I need.
+
+// I could have the create function loop through a list of all the tables that I want in the db and running an execute for each one.
+
 import 'dart:async';
 import 'dart:io';
 
@@ -17,9 +26,11 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
+const databaseName = "databaseTesting.db";
+
 class DataBaseHelper {
   // This is for putting data
-  static const _dbName = "test6.db";
+  static const _dbName = databaseName;
   static const _dbVersion = 1;
   static const _puttingTableName = "puttingTable";
   static const _approachTableName = "approachTable";
@@ -116,7 +127,7 @@ class DataBaseHelper {
 
 class ApproachDataBaseHelper {
   // This is for approach data
-  static const _dbName = "test6.db";
+  static const _dbName = databaseName;
   static const _dbVersion = 1;
   static const _puttingTableName = "puttingTable";
   static const _approachTableName = "approachTable";

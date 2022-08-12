@@ -284,6 +284,21 @@ class PuttingSetup extends StatelessWidget {
             ),
           ),
           const Divider(),
+          SizedBox(
+            height: 250,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: const [
+                Center(
+                    child: Text(
+                  "Session Putt Goal",
+                  textScaleFactor: 1.25,
+                )),
+                GoalSliders(),
+              ],
+            ),
+          ),
+          const Divider(),
           Column(
             children: const [
               Padding(
@@ -431,7 +446,7 @@ class ApproachSetup extends StatelessWidget {
                   "# of Discs",
                   textScaleFactor: 1.25,
                 )),
-                StackSizeSliders(),
+                AppStackSizeSliders(),
               ],
             ),
           ),
@@ -462,6 +477,21 @@ class ApproachSetup extends StatelessWidget {
                   textScaleFactor: 1.25,
                 )),
                 TargetSizeSliders(),
+              ],
+            ),
+          ),
+          const Divider(),
+          SizedBox(
+            height: 250,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: const [
+                Center(
+                    child: Text(
+                  "Session Throw Goal",
+                  textScaleFactor: 1.25,
+                )),
+                AppGoalSliders(),
               ],
             ),
           ),
@@ -797,6 +827,86 @@ class StackSizeSlidersState extends State<StackSizeSliders>
   }
 }
 
+// Approach Stack Size Slider
+
+class AppStackSizeSliders extends StatefulWidget {
+  const AppStackSizeSliders({Key? key}) : super(key: key);
+
+  @override
+  AppStackSizeSlidersState createState() => AppStackSizeSlidersState();
+}
+
+class AppStackSizeSlidersState extends State<AppStackSizeSliders>
+    with RestorationMixin {
+  final RestorableInt _continuousValue = RestorableInt(global.appStackSize);
+
+  @override
+  String get restorationId => 'appStackSize_slider';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_continuousValue, 'continuous_value');
+  }
+
+  @override
+  void dispose() {
+    _continuousValue.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Semantics(
+                child: SizedBox(
+                  width: 64,
+                  height: 48,
+                  child: TextField(
+                    textAlign: TextAlign.center,
+                    onSubmitted: (value) {
+                      final newValue = int.tryParse(value);
+                      if (newValue != null &&
+                          newValue != _continuousValue.value) {
+                        setState(() {
+                          _continuousValue.value =
+                              newValue.clamp(0, 20).truncate();
+                          global.appStackSize = newValue.clamp(0, 20).toInt();
+                        });
+                      }
+                    },
+                    keyboardType: TextInputType.number,
+                    controller: TextEditingController(
+                      text: _continuousValue.value.toStringAsFixed(0),
+                    ),
+                  ),
+                ),
+              ),
+              Slider(
+                value: _continuousValue.value.toDouble(),
+                min: 0,
+                max: 20,
+                onChanged: (value) {
+                  setState(() {
+                    _continuousValue.value = value.toInt();
+                    global.appStackSize = value.toInt();
+                  });
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 //
 // This is where the distance slider code goes
 
@@ -867,6 +977,164 @@ class DistanceSlidersState extends State<DistanceSliders>
                   setState(() {
                     _continuousValue.value = value.toInt();
                     global.distance = value.toInt();
+                  });
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Putting Goal Slider
+
+class GoalSliders extends StatefulWidget {
+  const GoalSliders({Key? key}) : super(key: key);
+
+  @override
+  GoalSlidersState createState() => GoalSlidersState();
+}
+
+class GoalSlidersState extends State<GoalSliders> with RestorationMixin {
+  final RestorableInt _continuousValue = RestorableInt(global.goal);
+
+  @override
+  String get restorationId => 'goal_slider';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_continuousValue, 'continuous_value');
+  }
+
+  @override
+  void dispose() {
+    _continuousValue.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Semantics(
+                child: SizedBox(
+                  width: 64,
+                  height: 48,
+                  child: TextField(
+                    textAlign: TextAlign.center,
+                    onSubmitted: (value) {
+                      final newValue = double.tryParse(value);
+                      if (newValue != null &&
+                          newValue != _continuousValue.value) {
+                        setState(() {
+                          _continuousValue.value =
+                              newValue.clamp(0, 200).truncate();
+                          global.goal = newValue.clamp(0, 200).toInt();
+                        });
+                      }
+                    },
+                    keyboardType: TextInputType.number,
+                    controller: TextEditingController(
+                      text: _continuousValue.value.toStringAsFixed(0),
+                    ),
+                  ),
+                ),
+              ),
+              Slider(
+                value: _continuousValue.value.toDouble(),
+                min: 0,
+                max: 200,
+                onChanged: (value) {
+                  setState(() {
+                    _continuousValue.value = value.toInt();
+                    global.goal = value.toInt();
+                  });
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Approach Goal Slider
+
+class AppGoalSliders extends StatefulWidget {
+  const AppGoalSliders({Key? key}) : super(key: key);
+
+  @override
+  AppGoalSlidersState createState() => AppGoalSlidersState();
+}
+
+class AppGoalSlidersState extends State<AppGoalSliders> with RestorationMixin {
+  final RestorableInt _continuousValue = RestorableInt(global.appGoal);
+
+  @override
+  String get restorationId => 'appGoal_slider';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_continuousValue, 'continuous_value');
+  }
+
+  @override
+  void dispose() {
+    _continuousValue.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Semantics(
+                child: SizedBox(
+                  width: 64,
+                  height: 48,
+                  child: TextField(
+                    textAlign: TextAlign.center,
+                    onSubmitted: (value) {
+                      final newValue = double.tryParse(value);
+                      if (newValue != null &&
+                          newValue != _continuousValue.value) {
+                        setState(() {
+                          _continuousValue.value =
+                              newValue.clamp(0, 200).truncate();
+                          global.appGoal = newValue.clamp(0, 200).toInt();
+                        });
+                      }
+                    },
+                    keyboardType: TextInputType.number,
+                    controller: TextEditingController(
+                      text: _continuousValue.value.toStringAsFixed(0),
+                    ),
+                  ),
+                ),
+              ),
+              Slider(
+                value: _continuousValue.value.toDouble(),
+                min: 0,
+                max: 200,
+                onChanged: (value) {
+                  setState(() {
+                    _continuousValue.value = value.toInt();
+                    global.appGoal = value.toInt();
                   });
                 },
               ),
@@ -1227,7 +1495,7 @@ class _ApproachCounterState extends State<ApproachCounterState> {
               onLongPress: () {
                 final makesSnackBar = SnackBar(
                     content: Text(
-                        "${global.makes}/${global.count} - Accuracy: ${((global.makes / global.count) * 100).truncate()}%"));
+                        "${global.appMakes}/${global.appCount} - Accuracy: ${((global.appMakes / global.appCount) * 100).truncate()}%"));
                 global.snackbarKey.currentState?.showSnackBar(makesSnackBar);
               },
               onTap: () => setState(() {

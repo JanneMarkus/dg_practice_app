@@ -461,7 +461,7 @@ class ApproachSetup extends StatelessWidget {
                   "Distance To Basket (ft)",
                   textScaleFactor: 1.25,
                 )),
-                DistanceSliders(),
+                AppDistanceSliders(),
               ],
             ),
           ),
@@ -473,7 +473,7 @@ class ApproachSetup extends StatelessWidget {
               children: const [
                 Center(
                     child: Text(
-                  "Size Of Target (ft)",
+                  "Radius Of Target (ft)",
                   textScaleFactor: 1.25,
                 )),
                 TargetSizeSliders(),
@@ -977,6 +977,84 @@ class DistanceSlidersState extends State<DistanceSliders>
                   setState(() {
                     _continuousValue.value = value.toInt();
                     global.distance = value.toInt();
+                  });
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class AppDistanceSliders extends StatefulWidget {
+  const AppDistanceSliders({Key? key}) : super(key: key);
+
+  @override
+  AppDistanceSlidersState createState() => AppDistanceSlidersState();
+}
+
+class AppDistanceSlidersState extends State<AppDistanceSliders>
+    with RestorationMixin {
+  final RestorableInt _continuousValue = RestorableInt(global.appDistance);
+
+  @override
+  String get restorationId => 'distance_slider';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_continuousValue, 'continuous_value');
+  }
+
+  @override
+  void dispose() {
+    _continuousValue.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Semantics(
+                child: SizedBox(
+                  width: 64,
+                  height: 48,
+                  child: TextField(
+                    textAlign: TextAlign.center,
+                    onSubmitted: (value) {
+                      final newValue = double.tryParse(value);
+                      if (newValue != null &&
+                          newValue != _continuousValue.value) {
+                        setState(() {
+                          _continuousValue.value =
+                              newValue.clamp(0, 300).truncate();
+                          global.appDistance = newValue.clamp(0, 300).toInt();
+                        });
+                      }
+                    },
+                    keyboardType: TextInputType.number,
+                    controller: TextEditingController(
+                      text: _continuousValue.value.toStringAsFixed(0),
+                    ),
+                  ),
+                ),
+              ),
+              Slider(
+                value: _continuousValue.value.toDouble(),
+                min: 50,
+                max: 300,
+                onChanged: (value) {
+                  setState(() {
+                    _continuousValue.value = value.toInt();
+                    global.appDistance = value.toInt();
                   });
                 },
               ),

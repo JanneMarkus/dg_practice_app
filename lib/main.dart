@@ -113,45 +113,25 @@ class ApproachWidget extends StatelessWidget {
   }
 }
 
-class NavigationDrawer extends StatelessWidget {
-  const NavigationDrawer({Key? key}) : super(key: key);
+// settings widget
+
+class SettingsWidget extends StatelessWidget {
+  const SettingsWidget({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => Drawer(
-          child: SingleChildScrollView(
-              child: Container(
-        padding: const EdgeInsets.fromLTRB(0, 75, 0, 0),
-        child: Wrap(
-          runSpacing: 16,
-          children: [
-            ListTile(
-              title: const Text("Putting"),
-              onTap: () {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => const PuttingWidget()));
-              },
-            ),
-            ListTile(
-                title: const Text("Approach"),
-                onTap: () {
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (context) => const ApproachWidget()));
-                }),
-            // ListTile(
-            //   title: const Text("Long Throws"),
-            //   onTap: () {},
-            // ),
-            // ListTile(
-            //   title: const Text("Utility Shots"),
-            //   onTap: () {},
-            // )
-          ],
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text("Settings"),
+          toolbarHeight: 50,
         ),
-      )));
+        drawer: const NavigationDrawer(),
+        body: ApplicationSetup());
+  }
 }
 
-class PuttingSetup extends StatelessWidget {
-  const PuttingSetup({Key? key}) : super(key: key);
+class ApplicationSetup extends StatelessWidget {
+  const ApplicationSetup({Key? key}) : super(key: key);
 
   // Setup Functions for sending database via email
   Future<String> get _localPath async {
@@ -215,6 +195,91 @@ class PuttingSetup extends StatelessWidget {
       print(e);
     }
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+        TextEditingController().clear();
+      },
+      child: ListView(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(50, 20, 50, 0),
+            child: ElevatedButton(
+              onPressed: () {
+                try {
+                  sendEmail();
+                } on Exception catch (e) {
+                  print(e);
+                }
+              },
+              onLongPress: () {
+                const Tooltip(message: 'Send Database.db as an email');
+              },
+              child: const Text("Export Database"),
+            ),
+          ),
+          Padding(
+              padding: const EdgeInsets.all(20),
+              child: Center(
+                  child: Opacity(
+                opacity: 0.5,
+                child:
+                    Text("Disc Golf Practice App Version: ${global.version}"),
+              ))),
+        ],
+      ),
+    );
+  }
+}
+
+class NavigationDrawer extends StatelessWidget {
+  const NavigationDrawer({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) => Drawer(
+          child: SingleChildScrollView(
+              child: Container(
+        padding: const EdgeInsets.fromLTRB(0, 75, 0, 0),
+        child: Wrap(
+          runSpacing: 16,
+          children: [
+            ListTile(
+              title: const Text("Putting"),
+              onTap: () {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => const PuttingWidget()));
+              },
+            ),
+            ListTile(
+                title: const Text("Approach"),
+                onTap: () {
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => const ApproachWidget()));
+                }),
+            ListTile(
+                title: const Text("Settings"),
+                onTap: () {
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => const SettingsWidget()));
+                }),
+            // ListTile(
+            //   title: const Text("Long Throws"),
+            //   onTap: () {},
+            // ),
+            // ListTile(
+            //   title: const Text("Utility Shots"),
+            //   onTap: () {},
+            // )
+          ],
+        ),
+      )));
+}
+
+class PuttingSetup extends StatelessWidget {
+  const PuttingSetup({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -307,23 +372,6 @@ class PuttingSetup extends StatelessWidget {
               ),
             ],
           ),
-          const Divider(),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
-            child: ElevatedButton(
-              onPressed: () {
-                try {
-                  sendEmail();
-                } on Exception catch (e) {
-                  print(e);
-                }
-              },
-              onLongPress: () {
-                const Tooltip(message: 'Send Database.db as an email');
-              },
-              child: const Text("Export Database"),
-            ),
-          ),
         ],
       ),
     );
@@ -332,69 +380,6 @@ class PuttingSetup extends StatelessWidget {
 
 class ApproachSetup extends StatelessWidget {
   const ApproachSetup({Key? key}) : super(key: key);
-
-  // Setup Functions for sending database via email
-  Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
-    return directory.path;
-  }
-
-  Future<File> get _localFile async {
-    final path = await _localPath;
-    return File('$path/databaseExport.csv');
-  }
-
-  Future<File> writeExport(List<String> databaseInfo) async {
-    final file = await _localFile;
-
-    // Write the file
-    return file.writeAsString(databaseInfo.toString());
-  }
-
-  Future sendEmail() async {
-    try {
-      GoogleAuthApi.signOut();
-      //Get app documents directory
-      final directory = await getApplicationDocumentsDirectory();
-      //Get dbFile from path and dbName
-      final dbFile = '${directory.path}/' + DataBaseHelper.dbName;
-      //Have user sign in to google account
-      final user = await GoogleAuthApi.signIn();
-      //Check if login was successful
-      if (user == null) return;
-
-      final email = user.email;
-      final auth = await user.authentication;
-      final token = auth.accessToken;
-      final smtpServer = gmailSaslXoauth2(email, token!);
-
-      // This will sign the user out every time the button is pressed. Remove this line for release.
-      //GoogleAuthApi.signOut();
-
-      // Create the email that will be sent
-
-      final message = Message()
-        ..from = Address(email)
-        ..recipients = [email]
-        ..subject = 'Database Export - ${DateTime.now()}'
-        ..text = 'Your database is attached.'
-        ..attachments = [
-          FileAttachment(File(dbFile))..location = Location.attachment
-        ];
-
-      await send(message, smtpServer);
-      final emailSentSnackBar =
-          SnackBar(content: Text("Database sent to $email."));
-      global.snackbarKey.currentState?.showSnackBar(emailSentSnackBar);
-    } on MailerException catch (e) {
-      const emailFailedSnackBar = SnackBar(
-        content: Text(
-            "There was a problem sending the email. Please reload the app and try again."),
-      );
-      global.snackbarKey.currentState?.showSnackBar(emailFailedSnackBar);
-      print(e);
-    }
-  }
 
   // Build approach setup page
 
@@ -503,23 +488,6 @@ class ApproachSetup extends StatelessWidget {
                 child: NotesField(),
               ),
             ],
-          ),
-          const Divider(),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
-            child: ElevatedButton(
-              onPressed: () {
-                try {
-                  sendEmail();
-                } on Exception catch (e) {
-                  print(e);
-                }
-              },
-              onLongPress: () {
-                const Tooltip(message: 'Send Database.db as an email');
-              },
-              child: const Text("Export Database"),
-            ),
           ),
         ],
       ),

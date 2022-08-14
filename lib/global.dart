@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+var version = 2.0;
+
 // Set default values for initial run
 var count = 0;
 var name = "Janne";

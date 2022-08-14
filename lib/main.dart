@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         title: _title,
         scaffoldMessengerKey: global.snackbarKey,
-        home: const MainAppWidget(),
+        home: const PuttingWidget(),
         theme: ThemeData(
           brightness: Brightness.dark,
           primarySwatch: accentColor,
@@ -31,8 +31,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MainAppWidget extends StatelessWidget {
-  const MainAppWidget({Key? key}) : super(key: key);
+class PuttingWidget extends StatelessWidget {
+  const PuttingWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +41,8 @@ class MainAppWidget extends StatelessWidget {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          toolbarHeight: 0,
+          title: const Text("Putting Practice"),
+          toolbarHeight: 50,
           bottom: const TabBar(
             indicatorColor: Colors.pink,
             tabs: <Widget>[
@@ -54,6 +55,7 @@ class MainAppWidget extends StatelessWidget {
             ],
           ),
         ),
+        drawer: const NavigationDrawer(),
         body: const TabBarView(
           physics: NeverScrollableScrollPhysics(),
           children: <Widget>[
@@ -68,6 +70,84 @@ class MainAppWidget extends StatelessWidget {
       ),
     );
   }
+}
+
+class ApproachWidget extends StatelessWidget {
+  const ApproachWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      initialIndex: global.startTab,
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Approach Practice"),
+          toolbarHeight: 50,
+          bottom: const TabBar(
+            indicatorColor: Colors.pink,
+            tabs: <Widget>[
+              Tab(
+                icon: Text('Setup'),
+              ),
+              Tab(
+                icon: Text('Throw'),
+              ),
+            ],
+          ),
+        ),
+        drawer: const NavigationDrawer(),
+        body: const TabBarView(
+          physics: NeverScrollableScrollPhysics(),
+          children: <Widget>[
+            Center(
+              child: ApproachSetup(),
+            ),
+            Center(
+              child: ApproachCounter(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class NavigationDrawer extends StatelessWidget {
+  const NavigationDrawer({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) => Drawer(
+          child: SingleChildScrollView(
+              child: Container(
+        padding: const EdgeInsets.fromLTRB(0, 75, 0, 0),
+        child: Wrap(
+          runSpacing: 16,
+          children: [
+            ListTile(
+              title: const Text("Putting"),
+              onTap: () {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => const PuttingWidget()));
+              },
+            ),
+            ListTile(
+                title: const Text("Approach"),
+                onTap: () {
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => const ApproachWidget()));
+                }),
+            // ListTile(
+            //   title: const Text("Long Throws"),
+            //   onTap: () {},
+            // ),
+            // ListTile(
+            //   title: const Text("Utility Shots"),
+            //   onTap: () {},
+            // )
+          ],
+        ),
+      )));
 }
 
 class PuttingSetup extends StatelessWidget {
@@ -200,6 +280,218 @@ class PuttingSetup extends StatelessWidget {
                   textScaleFactor: 1.25,
                 )),
                 DistanceSliders(),
+              ],
+            ),
+          ),
+          const Divider(),
+          SizedBox(
+            height: 250,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: const [
+                Center(
+                    child: Text(
+                  "Session Putt Goal",
+                  textScaleFactor: 1.25,
+                )),
+                GoalSliders(),
+              ],
+            ),
+          ),
+          const Divider(),
+          Column(
+            children: const [
+              Padding(
+                padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                child: NotesField(),
+              ),
+            ],
+          ),
+          const Divider(),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
+            child: ElevatedButton(
+              onPressed: () {
+                try {
+                  sendEmail();
+                } on Exception catch (e) {
+                  print(e);
+                }
+              },
+              onLongPress: () {
+                const Tooltip(message: 'Send Database.db as an email');
+              },
+              child: const Text("Export Database"),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ApproachSetup extends StatelessWidget {
+  const ApproachSetup({Key? key}) : super(key: key);
+
+  // Setup Functions for sending database via email
+  Future<String> get _localPath async {
+    final directory = await getApplicationDocumentsDirectory();
+    return directory.path;
+  }
+
+  Future<File> get _localFile async {
+    final path = await _localPath;
+    return File('$path/databaseExport.csv');
+  }
+
+  Future<File> writeExport(List<String> databaseInfo) async {
+    final file = await _localFile;
+
+    // Write the file
+    return file.writeAsString(databaseInfo.toString());
+  }
+
+  Future sendEmail() async {
+    try {
+      GoogleAuthApi.signOut();
+      //Get app documents directory
+      final directory = await getApplicationDocumentsDirectory();
+      //Get dbFile from path and dbName
+      final dbFile = '${directory.path}/' + DataBaseHelper.dbName;
+      //Have user sign in to google account
+      final user = await GoogleAuthApi.signIn();
+      //Check if login was successful
+      if (user == null) return;
+
+      final email = user.email;
+      final auth = await user.authentication;
+      final token = auth.accessToken;
+      final smtpServer = gmailSaslXoauth2(email, token!);
+
+      // This will sign the user out every time the button is pressed. Remove this line for release.
+      //GoogleAuthApi.signOut();
+
+      // Create the email that will be sent
+
+      final message = Message()
+        ..from = Address(email)
+        ..recipients = [email]
+        ..subject = 'Database Export - ${DateTime.now()}'
+        ..text = 'Your database is attached.'
+        ..attachments = [
+          FileAttachment(File(dbFile))..location = Location.attachment
+        ];
+
+      await send(message, smtpServer);
+      final emailSentSnackBar =
+          SnackBar(content: Text("Database sent to $email."));
+      global.snackbarKey.currentState?.showSnackBar(emailSentSnackBar);
+    } on MailerException catch (e) {
+      const emailFailedSnackBar = SnackBar(
+        content: Text(
+            "There was a problem sending the email. Please reload the app and try again."),
+      );
+      global.snackbarKey.currentState?.showSnackBar(emailFailedSnackBar);
+      print(e);
+    }
+  }
+
+  // Build approach setup page
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+        TextEditingController().clear();
+      },
+      child: ListView(
+        children: [
+          SizedBox(
+            height: 250,
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  const Center(
+                      child: Text(
+                    "Stance",
+                    textScaleFactor: 1.25,
+                  )),
+                  _StanceSelectorChip()
+                ]),
+          ),
+          const Divider(),
+          SizedBox(
+            height: 200,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                const Center(
+                    child: Text(
+                  "Shot Type",
+                  textScaleFactor: 1.25,
+                )),
+                _ShotTypeSelectorChip(),
+              ],
+            ),
+          ),
+          const Divider(),
+          SizedBox(
+            height: 250,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: const [
+                Center(
+                    child: Text(
+                  "# of Discs",
+                  textScaleFactor: 1.25,
+                )),
+                AppStackSizeSliders(),
+              ],
+            ),
+          ),
+          const Divider(),
+          SizedBox(
+            height: 250,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: const [
+                Center(
+                    child: Text(
+                  "Distance To Basket (ft)",
+                  textScaleFactor: 1.25,
+                )),
+                AppDistanceSliders(),
+              ],
+            ),
+          ),
+          const Divider(),
+          SizedBox(
+            height: 250,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: const [
+                Center(
+                    child: Text(
+                  "Radius Of Target (ft)",
+                  textScaleFactor: 1.25,
+                )),
+                TargetSizeSliders(),
+              ],
+            ),
+          ),
+          const Divider(),
+          SizedBox(
+            height: 250,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: const [
+                Center(
+                    child: Text(
+                  "Session Throw Goal",
+                  textScaleFactor: 1.25,
+                )),
+                AppGoalSliders(),
               ],
             ),
           ),
@@ -357,7 +649,7 @@ class _ShotTypeSelectorChipState extends State<_ShotTypeSelectorChip>
   }
 }
 
-// Stance Selector
+// Stance Selector Chip
 
 class _StanceSelectorChip extends StatefulWidget {
   @override
@@ -535,6 +827,86 @@ class StackSizeSlidersState extends State<StackSizeSliders>
   }
 }
 
+// Approach Stack Size Slider
+
+class AppStackSizeSliders extends StatefulWidget {
+  const AppStackSizeSliders({Key? key}) : super(key: key);
+
+  @override
+  AppStackSizeSlidersState createState() => AppStackSizeSlidersState();
+}
+
+class AppStackSizeSlidersState extends State<AppStackSizeSliders>
+    with RestorationMixin {
+  final RestorableInt _continuousValue = RestorableInt(global.appStackSize);
+
+  @override
+  String get restorationId => 'appStackSize_slider';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_continuousValue, 'continuous_value');
+  }
+
+  @override
+  void dispose() {
+    _continuousValue.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Semantics(
+                child: SizedBox(
+                  width: 64,
+                  height: 48,
+                  child: TextField(
+                    textAlign: TextAlign.center,
+                    onSubmitted: (value) {
+                      final newValue = int.tryParse(value);
+                      if (newValue != null &&
+                          newValue != _continuousValue.value) {
+                        setState(() {
+                          _continuousValue.value =
+                              newValue.clamp(0, 20).truncate();
+                          global.appStackSize = newValue.clamp(0, 20).toInt();
+                        });
+                      }
+                    },
+                    keyboardType: TextInputType.number,
+                    controller: TextEditingController(
+                      text: _continuousValue.value.toStringAsFixed(0),
+                    ),
+                  ),
+                ),
+              ),
+              Slider(
+                value: _continuousValue.value.toDouble(),
+                min: 0,
+                max: 20,
+                onChanged: (value) {
+                  setState(() {
+                    _continuousValue.value = value.toInt();
+                    global.appStackSize = value.toInt();
+                  });
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 //
 // This is where the distance slider code goes
 
@@ -585,8 +957,8 @@ class DistanceSlidersState extends State<DistanceSliders>
                           newValue != _continuousValue.value) {
                         setState(() {
                           _continuousValue.value =
-                              newValue.clamp(0, 100).truncate();
-                          global.distance = newValue.clamp(0, 100).toInt();
+                              newValue.clamp(0, 300).truncate();
+                          global.distance = newValue.clamp(0, 300).toInt();
                         });
                       }
                     },
@@ -600,11 +972,326 @@ class DistanceSlidersState extends State<DistanceSliders>
               Slider(
                 value: _continuousValue.value.toDouble(),
                 min: 0,
-                max: 100,
+                max: 300,
                 onChanged: (value) {
                   setState(() {
                     _continuousValue.value = value.toInt();
                     global.distance = value.toInt();
+                  });
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class AppDistanceSliders extends StatefulWidget {
+  const AppDistanceSliders({Key? key}) : super(key: key);
+
+  @override
+  AppDistanceSlidersState createState() => AppDistanceSlidersState();
+}
+
+class AppDistanceSlidersState extends State<AppDistanceSliders>
+    with RestorationMixin {
+  final RestorableInt _continuousValue = RestorableInt(global.appDistance);
+
+  @override
+  String get restorationId => 'distance_slider';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_continuousValue, 'continuous_value');
+  }
+
+  @override
+  void dispose() {
+    _continuousValue.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Semantics(
+                child: SizedBox(
+                  width: 64,
+                  height: 48,
+                  child: TextField(
+                    textAlign: TextAlign.center,
+                    onSubmitted: (value) {
+                      final newValue = double.tryParse(value);
+                      if (newValue != null &&
+                          newValue != _continuousValue.value) {
+                        setState(() {
+                          _continuousValue.value =
+                              newValue.clamp(0, 300).truncate();
+                          global.appDistance = newValue.clamp(0, 300).toInt();
+                        });
+                      }
+                    },
+                    keyboardType: TextInputType.number,
+                    controller: TextEditingController(
+                      text: _continuousValue.value.toStringAsFixed(0),
+                    ),
+                  ),
+                ),
+              ),
+              Slider(
+                value: _continuousValue.value.toDouble(),
+                min: 50,
+                max: 300,
+                onChanged: (value) {
+                  setState(() {
+                    _continuousValue.value = value.toInt();
+                    global.appDistance = value.toInt();
+                  });
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Putting Goal Slider
+
+class GoalSliders extends StatefulWidget {
+  const GoalSliders({Key? key}) : super(key: key);
+
+  @override
+  GoalSlidersState createState() => GoalSlidersState();
+}
+
+class GoalSlidersState extends State<GoalSliders> with RestorationMixin {
+  final RestorableInt _continuousValue = RestorableInt(global.goal);
+
+  @override
+  String get restorationId => 'goal_slider';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_continuousValue, 'continuous_value');
+  }
+
+  @override
+  void dispose() {
+    _continuousValue.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Semantics(
+                child: SizedBox(
+                  width: 64,
+                  height: 48,
+                  child: TextField(
+                    textAlign: TextAlign.center,
+                    onSubmitted: (value) {
+                      final newValue = double.tryParse(value);
+                      if (newValue != null &&
+                          newValue != _continuousValue.value) {
+                        setState(() {
+                          _continuousValue.value =
+                              newValue.clamp(0, 200).truncate();
+                          global.goal = newValue.clamp(0, 200).toInt();
+                        });
+                      }
+                    },
+                    keyboardType: TextInputType.number,
+                    controller: TextEditingController(
+                      text: _continuousValue.value.toStringAsFixed(0),
+                    ),
+                  ),
+                ),
+              ),
+              Slider(
+                value: _continuousValue.value.toDouble(),
+                min: 0,
+                max: 200,
+                onChanged: (value) {
+                  setState(() {
+                    _continuousValue.value = value.toInt();
+                    global.goal = value.toInt();
+                  });
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Approach Goal Slider
+
+class AppGoalSliders extends StatefulWidget {
+  const AppGoalSliders({Key? key}) : super(key: key);
+
+  @override
+  AppGoalSlidersState createState() => AppGoalSlidersState();
+}
+
+class AppGoalSlidersState extends State<AppGoalSliders> with RestorationMixin {
+  final RestorableInt _continuousValue = RestorableInt(global.appGoal);
+
+  @override
+  String get restorationId => 'appGoal_slider';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_continuousValue, 'continuous_value');
+  }
+
+  @override
+  void dispose() {
+    _continuousValue.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Semantics(
+                child: SizedBox(
+                  width: 64,
+                  height: 48,
+                  child: TextField(
+                    textAlign: TextAlign.center,
+                    onSubmitted: (value) {
+                      final newValue = double.tryParse(value);
+                      if (newValue != null &&
+                          newValue != _continuousValue.value) {
+                        setState(() {
+                          _continuousValue.value =
+                              newValue.clamp(0, 200).truncate();
+                          global.appGoal = newValue.clamp(0, 200).toInt();
+                        });
+                      }
+                    },
+                    keyboardType: TextInputType.number,
+                    controller: TextEditingController(
+                      text: _continuousValue.value.toStringAsFixed(0),
+                    ),
+                  ),
+                ),
+              ),
+              Slider(
+                value: _continuousValue.value.toDouble(),
+                min: 0,
+                max: 200,
+                onChanged: (value) {
+                  setState(() {
+                    _continuousValue.value = value.toInt();
+                    global.appGoal = value.toInt();
+                  });
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// TargetSize Sliders
+class TargetSizeSliders extends StatefulWidget {
+  const TargetSizeSliders({Key? key}) : super(key: key);
+
+  @override
+  TargetSizeSlidersState createState() => TargetSizeSlidersState();
+}
+
+class TargetSizeSlidersState extends State<TargetSizeSliders>
+    with RestorationMixin {
+  final RestorableInt _continuousValue = RestorableInt(global.appTargetSize);
+
+  @override
+  String get restorationId => 'TargetSize_slider';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_continuousValue, 'continuous_value');
+  }
+
+  @override
+  void dispose() {
+    _continuousValue.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Semantics(
+                child: SizedBox(
+                  width: 64,
+                  height: 48,
+                  child: TextField(
+                    textAlign: TextAlign.center,
+                    onSubmitted: (value) {
+                      final newValue = int.tryParse(value);
+                      if (newValue != null &&
+                          newValue != _continuousValue.value) {
+                        setState(() {
+                          _continuousValue.value =
+                              newValue.clamp(0, 50).truncate();
+                          global.appTargetSize = newValue.clamp(0, 50).toInt();
+                        });
+                      }
+                    },
+                    keyboardType: TextInputType.number,
+                    controller: TextEditingController(
+                      text: _continuousValue.value.toStringAsFixed(0),
+                    ),
+                  ),
+                ),
+              ),
+              Slider(
+                value: _continuousValue.value.toDouble(),
+                min: 0,
+                max: 50,
+                onChanged: (value) {
+                  setState(() {
+                    _continuousValue.value = value.toInt();
+                    global.appTargetSize = value.toInt();
                   });
                 },
               ),
@@ -657,6 +1344,54 @@ class _ShotsMadeState extends State<ShotsMade> {
   }
 }
 
+class AppShotsMade extends StatefulWidget {
+  const AppShotsMade({Key? key}) : super(key: key);
+  @override
+  State<AppShotsMade> createState() => _AppShotsMadeState();
+}
+
+class _AppShotsMadeState extends State<AppShotsMade> {
+  @override
+  Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
+    return Scaffold(
+      appBar: AppBar(title: const Text("Made throws")),
+      body: SafeArea(
+        top: false,
+        child: ListView.builder(
+            reverse: true,
+            itemBuilder: (context, int index) => SizedBox(
+                height: (height) / 7,
+                child: GestureDetector(
+                  onTap: () => {
+                    global.appMakes += index,
+                    global.appPreviousMake = index,
+                    print(global.appMakes),
+                    Navigator.pop(context)
+                  },
+                  child: Container(
+                    color: Color.fromARGB(
+                        (255 / global.appStackSize * index).ceil(), 200, 0, 0),
+                    child: Center(
+                        child: Text(
+                      (index).toString(),
+                      textScaleFactor: 5,
+                    )),
+                  ),
+                )),
+            itemCount: global.appStackSize + 1),
+      ),
+    );
+  }
+}
+
+class CustomPageRoute extends MaterialPageRoute {
+  CustomPageRoute({builder}) : super(builder: builder);
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 0);
+}
+
 //
 // This is where the putting counter code goes
 //
@@ -669,21 +1404,11 @@ class PuttingCounter extends StatelessWidget {
   }
 }
 
-class CustomPageRoute extends MaterialPageRoute {
-  CustomPageRoute({builder}) : super(builder: builder);
-
-  @override
-  Duration get transitionDuration => const Duration(milliseconds: 0);
-}
-
 class Counter extends StatefulWidget {
   const Counter({Key? key}) : super(key: key);
   @override
   _CounterState createState() => _CounterState();
 }
-
-// add a cache feature for the makes so that when I press the back button, the previously
-// selected makes is subtracted from the makes count.
 
 class _CounterState extends State<Counter> {
   var stackSize = global.stackSize;
@@ -786,7 +1511,7 @@ class _CounterState extends State<Counter> {
                     });
                     final snackBar = SnackBar(
                         content: Text(
-                            "Logged session $i to database:\n\nYou made $currentMakes of $currentCount ${global.shotType == 0 ? "hyzer" : (global.shotType == 1 ? "flat" : "anhyzer")} throws from ${global.distance} feet."),
+                            "Logged session $i to putting table:\n\nYou made $currentMakes of $currentCount ${global.shotType == 0 ? "hyzer" : (global.shotType == 1 ? "flat" : "anhyzer")} throws from ${global.distance} feet."),
 
                         // Undo Session Log
                         action: SnackBarAction(
@@ -798,6 +1523,161 @@ class _CounterState extends State<Counter> {
                               global.makes = currentMakes;
                               global.notes = currentNotes;
                               if (global.count >= global.goal) {
+                                global.backgroundColor = global.green;
+                              } else {
+                                global.backgroundColor = Colors.transparent;
+                              }
+                            });
+                            final deleteSnackBar = SnackBar(
+                              content: Text("Deleted session $i"),
+                            );
+                            global.snackbarKey.currentState
+                                ?.showSnackBar(deleteSnackBar);
+                          },
+                          //
+                        ));
+                    global.snackbarKey.currentState?.showSnackBar(snackBar);
+                  }),
+      ])
+    ]);
+  }
+}
+
+//
+// This is where the approach counter code goes
+//
+class ApproachCounter extends StatelessWidget {
+  const ApproachCounter({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return const ApproachCounterState();
+  }
+}
+
+class ApproachCounterState extends StatefulWidget {
+  const ApproachCounterState({Key? key}) : super(key: key);
+  @override
+  _ApproachCounterState createState() => _ApproachCounterState();
+}
+
+class _ApproachCounterState extends State<ApproachCounterState> {
+  var appStackSize = global.appStackSize;
+  @override
+  Widget build(BuildContext context) {
+    return Stack(children: [
+      LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+        return Row(children: [
+          GestureDetector(
+              onLongPress: () {
+                final makesSnackBar = SnackBar(
+                    content: Text(
+                        "${global.appMakes}/${global.appCount} - Accuracy: ${((global.appMakes / global.appCount) * 100).truncate()}%"));
+                global.snackbarKey.currentState?.showSnackBar(makesSnackBar);
+              },
+              onTap: () => setState(() {
+                    if (global.appCount - appStackSize <= 0) {
+                      global.appMakes = 0;
+                      global.appCount = 0;
+                    } else {
+                      global.appCount = global.appCount - appStackSize;
+                      global.appMakes -= global.appPreviousMake;
+                    }
+                    if (global.appCount >= global.appGoal) {
+                      global.backgroundColor = global.green;
+                    } else {
+                      global.backgroundColor = Colors.transparent;
+                    }
+                  }),
+              child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                      height: constraints.maxHeight,
+                      width: (MediaQuery.of(context).size.width / 2),
+                      color: global.backgroundColor))),
+          GestureDetector(
+              onLongPress: () {
+                final makesSnackBar = SnackBar(
+                    content: Text(
+                        "${global.appMakes}/${global.appCount} - Accuracy: ${(global.appMakes / global.appCount) * 100.round()}%"));
+                global.snackbarKey.currentState?.showSnackBar(makesSnackBar);
+              },
+              onTap: () => setState(() {
+                    Navigator.push(
+                        context,
+                        CustomPageRoute(
+                            builder: (context) => const AppShotsMade()));
+                    global.appCount = global.appCount + appStackSize;
+                    if (global.appCount >= global.appGoal) {
+                      global.backgroundColor = global.green;
+                    } else {
+                      global.backgroundColor = Colors.transparent;
+                    }
+                  }),
+              child: Align(
+                  alignment: Alignment.topRight,
+                  child: Container(
+                      height: constraints.maxHeight,
+                      width: (MediaQuery.of(context).size.width / 2),
+                      color: global.backgroundColor))),
+        ]);
+      }),
+      Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+        Center(
+            child: IgnorePointer(
+                child: Text(
+          "${global.appCount}",
+          textScaleFactor: 10,
+        ))),
+        ElevatedButton(
+            child: const Text(
+              "Log Session",
+              textScaleFactor: 2,
+            ),
+            style: null,
+            onPressed: global.appCount == 0
+                ? null
+                : () async {
+                    final currentCount = global.appCount;
+                    final currentMakes = global.appMakes;
+                    final currentNotes = global.appNotes;
+                    int? i = await ApproachDataBaseHelper.instance.insert({
+                      ApproachDataBaseHelper.columnName: global.appName,
+                      ApproachDataBaseHelper.columnDate:
+                          DateTime.now().toString(),
+                      ApproachDataBaseHelper.columnThrows: global.appCount,
+                      ApproachDataBaseHelper.columnMakes: global.appMakes,
+                      ApproachDataBaseHelper.columnShotType: global.appShotType,
+                      ApproachDataBaseHelper.columnDistance: global.appDistance,
+                      ApproachDataBaseHelper.columnTargetSize:
+                          global.appTargetSize,
+                      ApproachDataBaseHelper.columnStackSize:
+                          global.appStackSize,
+                      ApproachDataBaseHelper.columnStance: global.appStance,
+                      ApproachDataBaseHelper.columnNotes: global.appNotes,
+                    });
+
+                    setState(() {
+                      global.appMakes = 0;
+                      global.appCount = 0;
+                      global.appNotes = "";
+                      global.backgroundColor = Colors.transparent;
+                    });
+                    final snackBar = SnackBar(
+                        content: Text(
+                            "Logged session $i to approach table:\n\nYou made $currentMakes of $currentCount ${global.appShotType == 0 ? "hyzer" : (global.appShotType == 1 ? "flat" : "anhyzer")} throws from ${global.appDistance} feet."),
+
+                        // Undo Session Log
+                        action: SnackBarAction(
+                          label: 'Undo',
+                          onPressed: () async {
+                            await ApproachDataBaseHelper.instance.delete(i);
+                            setState(() {
+                              global.appCount = currentCount;
+                              global.appMakes = currentMakes;
+                              global.appNotes = currentNotes;
+                              if (global.appCount >= global.appGoal) {
                                 global.backgroundColor = global.green;
                               } else {
                                 global.backgroundColor = Colors.transparent;

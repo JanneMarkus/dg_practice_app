@@ -8,7 +8,7 @@ var previousMake = 0;
 var stackSize = 5;
 var distance = 15;
 var shotType = 1;
-var stance = '';
+var stance = 'Normal';
 var goal = 100;
 var date = "";
 var green = const Color.fromRGBO(152, 190, 100, 1);
@@ -19,3 +19,19 @@ var notes = "";
 
 final GlobalKey<ScaffoldMessengerState> snackbarKey =
     GlobalKey<ScaffoldMessengerState>();
+
+//values for approach shots
+var appCount = 0;
+var appName = "Janne";
+var appMakes = 0;
+var appPreviousMake = 0;
+var appStackSize = 5;
+var appDistance = 150;
+var appTargetSize = 15;
+var appShotType = 1;
+var appStance = '';
+var appGoal = 100;
+var appDate = "";
+var appStartTab = 0;
+var appTable = [];
+var appNotes = "";

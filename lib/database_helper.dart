@@ -3,7 +3,7 @@
 // My table needs to have
 // [DONE] An ID column
 // A date column
-// A shot type column
+// A Shot Angle column
 // A Distance column
 // A Throws column
 // A Makes column
@@ -26,7 +26,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
-const databaseName = "profileBuild08102022.db";
+const databaseName = "profileBuild08152022.db";
 
 const puttingTableCreate = """
     CREATE TABLE puttingTable (

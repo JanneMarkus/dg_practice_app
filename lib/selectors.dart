@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'global.dart' as global;
 
-// Shot Type Selector Chip
+// Shot Angle Selector Chip
 
 //
 // To be switched to Shot Angle Selector Chip

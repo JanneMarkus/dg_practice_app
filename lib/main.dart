@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
   final accentColor = Colors.pink;
-  static const String _title = 'Putting App';
+  static const String _title = 'DG Practice App';
 
   @override
   Widget build(BuildContext context) {
@@ -214,7 +214,7 @@ class PuttingSetup extends StatelessWidget {
               children: const [
                 Center(
                     child: Text(
-                  "Shot Type",
+                  "Shot Angle",
                   textScaleFactor: 1.25,
                 )),
                 ShotAngleSelectorChip(),
@@ -316,7 +316,7 @@ class ApproachSetup extends StatelessWidget {
               children: [
                 const Center(
                     child: Text(
-                  "Shot Type",
+                  "Shot Angle",
                   textScaleFactor: 1.25,
                 )),
                 ShotAngleSelectorChip(),

@@ -26,7 +26,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
-const databaseName = "profileBuild08152022.db";
+const databaseName = "profileBuild08152022_2.db";
 
 const puttingTableCreate = """
     CREATE TABLE puttingTable (
@@ -52,7 +52,7 @@ const approachTableCreate = """
     throws INTEGER,
     makes INTEGER,
     stackSize INTEGER,
-    stance TEXT,
+    shotType TEXT,
     notes TEXT);
     """;
 
@@ -145,6 +145,7 @@ class ApproachDataBaseHelper {
   static const columnMakes = 'makes';
   static const columnStackSize = 'stackSize';
   static const columnStance = 'stance';
+  static const columnShotType = 'shotType';
   static const columnNotes = 'notes';
 
   // Making it a singleton class

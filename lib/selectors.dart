@@ -75,6 +75,66 @@ class ShotAngleSelectorChipState extends State<ShotAngleSelectorChip>
   }
 }
 
+// Shot Type Selector Chip (Forehand / Backhand)
+
+class AppShotTypeSelectorChip extends StatefulWidget {
+  const AppShotTypeSelectorChip({super.key});
+
+  @override
+  AppShotTypeSelectorChipState createState() => AppShotTypeSelectorChipState();
+}
+
+class AppShotTypeSelectorChipState extends State<AppShotTypeSelectorChip>
+    with RestorationMixin {
+  final RestorableInt _indexSelected =
+      RestorableInt(global.appShotType == "Backhand" ? 0 : 1);
+
+  @override
+  String get restorationId => 'choice_chip_demo';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_indexSelected, 'choice_chip');
+  }
+
+  @override
+  void dispose() {
+    _indexSelected.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Wrap(
+        children: [
+          ChoiceChip(
+            label: const Text("Backhand"),
+            selected: _indexSelected.value == 0,
+            onSelected: (value) {
+              setState(() {
+                _indexSelected.value = value ? 0 : -1;
+                global.appShotType = "Backhand";
+              });
+            },
+          ),
+          const SizedBox(width: 8),
+          ChoiceChip(
+            label: const Text("Forehand"),
+            selected: _indexSelected.value == 1,
+            onSelected: (value) {
+              setState(() {
+                _indexSelected.value = value ? 1 : -1;
+                global.appShotType = "Forehand";
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // Stance Selector Chip
 
 class StanceSelectorChip extends StatefulWidget {

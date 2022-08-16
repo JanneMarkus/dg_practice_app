@@ -299,13 +299,13 @@ class ApproachSetup extends StatelessWidget {
             height: 250,
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  const Center(
+                children: const [
+                  Center(
                       child: Text(
-                    "Stance",
+                    "Shot Type",
                     textScaleFactor: 1.25,
                   )),
-                  StanceSelectorChip()
+                  AppShotTypeSelectorChip()
                 ]),
           ),
           const Divider(),
@@ -313,8 +313,8 @@ class ApproachSetup extends StatelessWidget {
             height: 200,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                const Center(
+              children: const [
+                Center(
                     child: Text(
                   "Shot Angle",
                   textScaleFactor: 1.25,
@@ -802,7 +802,7 @@ class _ApproachCounterState extends State<ApproachCounterState> {
                           global.appTargetSize,
                       ApproachDataBaseHelper.columnStackSize:
                           global.appStackSize,
-                      ApproachDataBaseHelper.columnStance: global.appStance,
+                      ApproachDataBaseHelper.columnShotType: global.appShotType,
                       ApproachDataBaseHelper.columnNotes: global.appNotes,
                     });
 
@@ -814,7 +814,7 @@ class _ApproachCounterState extends State<ApproachCounterState> {
                     });
                     final snackBar = SnackBar(
                         content: Text(
-                            "Logged session $i to approach table:\n\nYou made $currentMakes of $currentCount ${global.appShotAngle == 0 ? "hyzer" : (global.appShotAngle == 1 ? "flat" : "anhyzer")} throws from ${global.appDistance} feet."),
+                            "Logged session $i to approach table:\n\nYou made $currentMakes of $currentCount ${global.appShotAngle == 0 ? "hyzer" : (global.appShotAngle == 1 ? "flat" : "anhyzer")} ${global.appShotType == "Backhand" ? "backhand" : "forehand"} throws from ${global.appDistance} feet."),
 
                         // Undo Session Log
                         action: SnackBarAction(

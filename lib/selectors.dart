@@ -7,16 +7,16 @@ import 'global.dart' as global;
 // To be switched to Shot Angle Selector Chip
 //
 
-class ShotTypeSelectorChip extends StatefulWidget {
-  const ShotTypeSelectorChip({super.key});
+class ShotAngleSelectorChip extends StatefulWidget {
+  const ShotAngleSelectorChip({super.key});
 
   @override
-  ShotTypeSelectorChipState createState() => ShotTypeSelectorChipState();
+  ShotAngleSelectorChipState createState() => ShotAngleSelectorChipState();
 }
 
-class ShotTypeSelectorChipState extends State<ShotTypeSelectorChip>
+class ShotAngleSelectorChipState extends State<ShotAngleSelectorChip>
     with RestorationMixin {
-  final RestorableInt _indexSelected = RestorableInt(global.shotType);
+  final RestorableInt _indexSelected = RestorableInt(global.shotAngle);
 
   @override
   String get restorationId => 'choice_chip_demo';
@@ -43,7 +43,7 @@ class ShotTypeSelectorChipState extends State<ShotTypeSelectorChip>
             onSelected: (value) {
               setState(() {
                 _indexSelected.value = value ? 0 : -1;
-                global.shotType = 0;
+                global.shotAngle = 0;
               });
             },
           ),
@@ -54,7 +54,7 @@ class ShotTypeSelectorChipState extends State<ShotTypeSelectorChip>
             onSelected: (value) {
               setState(() {
                 _indexSelected.value = value ? 1 : -1;
-                global.shotType = 1;
+                global.shotAngle = 1;
               });
             },
           ),
@@ -65,7 +65,7 @@ class ShotTypeSelectorChipState extends State<ShotTypeSelectorChip>
             onSelected: (value) {
               setState(() {
                 _indexSelected.value = value ? 2 : -1;
-                global.shotType = 2;
+                global.shotAngle = 2;
               });
             },
           ),

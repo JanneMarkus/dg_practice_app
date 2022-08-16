@@ -217,7 +217,7 @@ class PuttingSetup extends StatelessWidget {
                   "Shot Type",
                   textScaleFactor: 1.25,
                 )),
-                ShotTypeSelectorChip(),
+                ShotAngleSelectorChip(),
               ],
             ),
           ),
@@ -319,7 +319,7 @@ class ApproachSetup extends StatelessWidget {
                   "Shot Type",
                   textScaleFactor: 1.25,
                 )),
-                ShotTypeSelectorChip(),
+                ShotAngleSelectorChip(),
               ],
             ),
           ),
@@ -643,7 +643,7 @@ class _CounterState extends State<Counter> {
                       DataBaseHelper.columnDate: DateTime.now().toString(),
                       DataBaseHelper.columnThrows: global.count,
                       DataBaseHelper.columnMakes: global.makes,
-                      DataBaseHelper.columnShotType: global.shotType,
+                      DataBaseHelper.columnShotAngle: global.shotAngle,
                       DataBaseHelper.columnDistance: global.distance,
                       DataBaseHelper.columnStackSize: global.stackSize,
                       DataBaseHelper.columnStance: global.stance,
@@ -658,7 +658,7 @@ class _CounterState extends State<Counter> {
                     });
                     final snackBar = SnackBar(
                         content: Text(
-                            "Logged session $i to putting table:\n\nYou made $currentMakes of $currentCount ${global.shotType == 0 ? "hyzer" : (global.shotType == 1 ? "flat" : "anhyzer")} throws from ${global.distance} feet."),
+                            "Logged session $i to putting table:\n\nYou made $currentMakes of $currentCount ${global.shotAngle == 0 ? "hyzer" : (global.shotAngle == 1 ? "flat" : "anhyzer")} throws from ${global.distance} feet."),
 
                         // Undo Session Log
                         action: SnackBarAction(
@@ -795,7 +795,8 @@ class _ApproachCounterState extends State<ApproachCounterState> {
                           DateTime.now().toString(),
                       ApproachDataBaseHelper.columnThrows: global.appCount,
                       ApproachDataBaseHelper.columnMakes: global.appMakes,
-                      ApproachDataBaseHelper.columnShotType: global.appShotType,
+                      ApproachDataBaseHelper.columnShotAngle:
+                          global.appShotAngle,
                       ApproachDataBaseHelper.columnDistance: global.appDistance,
                       ApproachDataBaseHelper.columnTargetSize:
                           global.appTargetSize,
@@ -813,7 +814,7 @@ class _ApproachCounterState extends State<ApproachCounterState> {
                     });
                     final snackBar = SnackBar(
                         content: Text(
-                            "Logged session $i to approach table:\n\nYou made $currentMakes of $currentCount ${global.appShotType == 0 ? "hyzer" : (global.appShotType == 1 ? "flat" : "anhyzer")} throws from ${global.appDistance} feet."),
+                            "Logged session $i to approach table:\n\nYou made $currentMakes of $currentCount ${global.appShotAngle == 0 ? "hyzer" : (global.appShotAngle == 1 ? "flat" : "anhyzer")} throws from ${global.appDistance} feet."),
 
                         // Undo Session Log
                         action: SnackBarAction(

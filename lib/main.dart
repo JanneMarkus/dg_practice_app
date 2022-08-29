@@ -319,7 +319,7 @@ class ApproachSetup extends StatelessWidget {
                   "Shot Angle",
                   textScaleFactor: 1.25,
                 )),
-                ShotAngleSelectorChip(),
+                AppShotAngleSelectorChip(),
               ],
             ),
           ),

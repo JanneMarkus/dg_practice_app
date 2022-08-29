@@ -75,6 +75,75 @@ class ShotAngleSelectorChipState extends State<ShotAngleSelectorChip>
   }
 }
 
+class AppShotAngleSelectorChip extends StatefulWidget {
+  const AppShotAngleSelectorChip({super.key});
+
+  @override
+  AppShotAngleSelectorChipState createState() =>
+      AppShotAngleSelectorChipState();
+}
+
+class AppShotAngleSelectorChipState extends State<AppShotAngleSelectorChip>
+    with RestorationMixin {
+  final RestorableInt _indexSelected = RestorableInt(global.appShotAngle);
+
+  @override
+  String get restorationId => 'choice_chip_demo';
+
+  @override
+  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
+    registerForRestoration(_indexSelected, 'choice_chip');
+  }
+
+  @override
+  void dispose() {
+    _indexSelected.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Wrap(
+        children: [
+          ChoiceChip(
+            label: const Text("Hyzer"),
+            selected: _indexSelected.value == 0,
+            onSelected: (value) {
+              setState(() {
+                _indexSelected.value = value ? 0 : -1;
+                global.appShotAngle = 0;
+              });
+            },
+          ),
+          const SizedBox(width: 8),
+          ChoiceChip(
+            label: const Text("Flat"),
+            selected: _indexSelected.value == 1,
+            onSelected: (value) {
+              setState(() {
+                _indexSelected.value = value ? 1 : -1;
+                global.appShotAngle = 1;
+              });
+            },
+          ),
+          const SizedBox(width: 8),
+          ChoiceChip(
+            label: const Text("Anhyzer"),
+            selected: _indexSelected.value == 2,
+            onSelected: (value) {
+              setState(() {
+                _indexSelected.value = value ? 2 : -1;
+                global.appShotAngle = 2;
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // Shot Type Selector Chip (Forehand / Backhand)
 
 class AppShotTypeSelectorChip extends StatefulWidget {

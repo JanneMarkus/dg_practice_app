@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-var version = 2.1;
+var version = 2.2;
 
 // Set default values for initial run
 var count = 0;

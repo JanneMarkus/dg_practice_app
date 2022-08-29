@@ -445,6 +445,8 @@ class _NotesFieldState extends State<NotesField> {
   Widget build(BuildContext context) {
     return TextField(
       controller: notesController,
+      textCapitalization: TextCapitalization.sentences,
+      autocorrect: true,
       onChanged: (String value) {
         global.notes = value;
       },

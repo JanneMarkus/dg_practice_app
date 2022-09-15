@@ -3,7 +3,7 @@
 // My table needs to have
 // [DONE] An ID column
 // A date column
-// A shot type column
+// A Shot Angle column
 // A Distance column
 // A Throws column
 // A Makes column
@@ -26,14 +26,14 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
-const databaseName = "profileBuild08102022.db";
+const databaseName = "profileBuild08152022_3.db";
 
 const puttingTableCreate = """
     CREATE TABLE puttingTable (
     _id INTEGER PRIMARY KEY,
     name TEXT,
     date TEXT,
-    shotType TEXT,
+    shotAngle TEXT,
     distance INTEGER,
     throws INTEGER,
     makes INTEGER,
@@ -46,13 +46,13 @@ const approachTableCreate = """
     _id INTEGER PRIMARY KEY,
     name TEXT,
     date TEXT,
-    shotType TEXT,
+    shotAngle TEXT,
     distance INTEGER,
     targetSize INTEGER,
     throws INTEGER,
     makes INTEGER,
     stackSize INTEGER,
-    stance TEXT,
+    shotType TEXT,
     notes TEXT);
     """;
 
@@ -61,13 +61,12 @@ class DataBaseHelper {
   static const _dbName = databaseName;
   static const _dbVersion = 1;
   static const _puttingTableName = "puttingTable";
-  static const _approachTableName = "approachTable";
   static const dbName = _dbName;
 
   static const columnId = "_id";
   static const columnName = "name";
   static const columnDate = "date";
-  static const columnShotType = "shotType";
+  static const columnShotAngle = "shotAngle";
   static const columnDistance = "distance";
   static const columnTargetSize = "targetSize";
   static const columnThrows = 'throws';
@@ -133,20 +132,20 @@ class ApproachDataBaseHelper {
   // This is for approach data
   static const _dbName = databaseName;
   static const _dbVersion = 1;
-  static const _puttingTableName = "puttingTable";
   static const _approachTableName = "approachTable";
   static const dbName = _dbName;
 
   static const columnId = "_id";
   static const columnName = "name";
   static const columnDate = "date";
-  static const columnShotType = "shotType";
+  static const columnShotAngle = "shotAngle";
   static const columnDistance = "distance";
   static const columnTargetSize = "targetSize";
   static const columnThrows = 'throws';
   static const columnMakes = 'makes';
   static const columnStackSize = 'stackSize';
   static const columnStance = 'stance';
+  static const columnShotType = 'shotType';
   static const columnNotes = 'notes';
 
   // Making it a singleton class

@@ -7,6 +7,8 @@ import 'package:path_provider/path_provider.dart';
 import 'database_helper.dart';
 import 'package:mailer/mailer.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'nav_drawer_widgets.dart';
+import 'selectors.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -16,7 +18,7 @@ class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
   final accentColor = Colors.pink;
-  static const String _title = 'Putting App';
+  static const String _title = 'DG Practice App';
 
   @override
   Widget build(BuildContext context) {
@@ -31,127 +33,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class PuttingWidget extends StatelessWidget {
-  const PuttingWidget({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      initialIndex: global.startTab,
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Putting Practice"),
-          toolbarHeight: 50,
-          bottom: const TabBar(
-            indicatorColor: Colors.pink,
-            tabs: <Widget>[
-              Tab(
-                icon: Text('Setup'),
-              ),
-              Tab(
-                icon: Text('Putt'),
-              ),
-            ],
-          ),
-        ),
-        drawer: const NavigationDrawer(),
-        body: const TabBarView(
-          physics: NeverScrollableScrollPhysics(),
-          children: <Widget>[
-            Center(
-              child: PuttingSetup(),
-            ),
-            Center(
-              child: PuttingCounter(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class ApproachWidget extends StatelessWidget {
-  const ApproachWidget({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      initialIndex: global.startTab,
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Approach Practice"),
-          toolbarHeight: 50,
-          bottom: const TabBar(
-            indicatorColor: Colors.pink,
-            tabs: <Widget>[
-              Tab(
-                icon: Text('Setup'),
-              ),
-              Tab(
-                icon: Text('Throw'),
-              ),
-            ],
-          ),
-        ),
-        drawer: const NavigationDrawer(),
-        body: const TabBarView(
-          physics: NeverScrollableScrollPhysics(),
-          children: <Widget>[
-            Center(
-              child: ApproachSetup(),
-            ),
-            Center(
-              child: ApproachCounter(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class NavigationDrawer extends StatelessWidget {
-  const NavigationDrawer({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) => Drawer(
-          child: SingleChildScrollView(
-              child: Container(
-        padding: const EdgeInsets.fromLTRB(0, 75, 0, 0),
-        child: Wrap(
-          runSpacing: 16,
-          children: [
-            ListTile(
-              title: const Text("Putting"),
-              onTap: () {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => const PuttingWidget()));
-              },
-            ),
-            ListTile(
-                title: const Text("Approach"),
-                onTap: () {
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (context) => const ApproachWidget()));
-                }),
-            // ListTile(
-            //   title: const Text("Long Throws"),
-            //   onTap: () {},
-            // ),
-            // ListTile(
-            //   title: const Text("Utility Shots"),
-            //   onTap: () {},
-            // )
-          ],
-        ),
-      )));
-}
-
-class PuttingSetup extends StatelessWidget {
-  const PuttingSetup({Key? key}) : super(key: key);
+class ApplicationSetup extends StatelessWidget {
+  const ApplicationSetup({Key? key}) : super(key: key);
 
   // Setup Functions for sending database via email
   Future<String> get _localPath async {
@@ -225,17 +108,105 @@ class PuttingSetup extends StatelessWidget {
       },
       child: ListView(
         children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(50, 20, 50, 0),
+            child: ElevatedButton(
+              onPressed: () {
+                try {
+                  sendEmail();
+                } on Exception catch (e) {
+                  print(e);
+                }
+              },
+              onLongPress: () {
+                const Tooltip(message: 'Send Database.db as an email');
+              },
+              child: const Text("Export Database"),
+            ),
+          ),
+          Padding(
+              padding: const EdgeInsets.all(20),
+              child: Center(
+                  child: Opacity(
+                opacity: 0.5,
+                child: Text("Running Chains Version: ${global.version}"),
+              ))),
+        ],
+      ),
+    );
+  }
+}
+
+class NavigationDrawer extends StatelessWidget {
+  const NavigationDrawer({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) => Drawer(
+          child: SingleChildScrollView(
+              child: Container(
+        padding: const EdgeInsets.fromLTRB(0, 75, 0, 0),
+        child: Wrap(
+          runSpacing: 16,
+          children: [
+            ListTile(
+              title: const Text("Putting"),
+              onTap: () {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => const PuttingWidget()));
+              },
+            ),
+            ListTile(
+                title: const Text("Approach"),
+                onTap: () {
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => const ApproachWidget()));
+                }),
+            ListTile(
+                title: const Text("Settings"),
+                onTap: () {
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => const SettingsWidget()));
+                }),
+            // ListTile(
+            //   title: const Text("Long Throws"),
+            //   onTap: () {},
+            // ),
+            // ListTile(
+            //   title: const Text("Utility Shots"),
+            //   onTap: () {},
+            // )
+            // ListTile(
+            //   title: const Text("Gap Shots"),
+            //   onTap: () {},
+            // )
+          ],
+        ),
+      )));
+}
+
+class PuttingSetup extends StatelessWidget {
+  const PuttingSetup({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+        TextEditingController().clear();
+      },
+      child: ListView(
+        children: [
           SizedBox(
             height: 250,
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  const Center(
+                children: const [
+                  Center(
                       child: Text(
                     "Stance",
                     textScaleFactor: 1.25,
                   )),
-                  _StanceSelectorChip()
+                  StanceSelectorChip()
                 ]),
           ),
           const Divider(),
@@ -243,13 +214,13 @@ class PuttingSetup extends StatelessWidget {
             height: 200,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                const Center(
+              children: const [
+                Center(
                     child: Text(
-                  "Shot Type",
+                  "Shot Angle",
                   textScaleFactor: 1.25,
                 )),
-                _ShotTypeSelectorChip(),
+                ShotAngleSelectorChip(),
               ],
             ),
           ),
@@ -307,23 +278,6 @@ class PuttingSetup extends StatelessWidget {
               ),
             ],
           ),
-          const Divider(),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
-            child: ElevatedButton(
-              onPressed: () {
-                try {
-                  sendEmail();
-                } on Exception catch (e) {
-                  print(e);
-                }
-              },
-              onLongPress: () {
-                const Tooltip(message: 'Send Database.db as an email');
-              },
-              child: const Text("Export Database"),
-            ),
-          ),
         ],
       ),
     );
@@ -332,69 +286,6 @@ class PuttingSetup extends StatelessWidget {
 
 class ApproachSetup extends StatelessWidget {
   const ApproachSetup({Key? key}) : super(key: key);
-
-  // Setup Functions for sending database via email
-  Future<String> get _localPath async {
-    final directory = await getApplicationDocumentsDirectory();
-    return directory.path;
-  }
-
-  Future<File> get _localFile async {
-    final path = await _localPath;
-    return File('$path/databaseExport.csv');
-  }
-
-  Future<File> writeExport(List<String> databaseInfo) async {
-    final file = await _localFile;
-
-    // Write the file
-    return file.writeAsString(databaseInfo.toString());
-  }
-
-  Future sendEmail() async {
-    try {
-      GoogleAuthApi.signOut();
-      //Get app documents directory
-      final directory = await getApplicationDocumentsDirectory();
-      //Get dbFile from path and dbName
-      final dbFile = '${directory.path}/' + DataBaseHelper.dbName;
-      //Have user sign in to google account
-      final user = await GoogleAuthApi.signIn();
-      //Check if login was successful
-      if (user == null) return;
-
-      final email = user.email;
-      final auth = await user.authentication;
-      final token = auth.accessToken;
-      final smtpServer = gmailSaslXoauth2(email, token!);
-
-      // This will sign the user out every time the button is pressed. Remove this line for release.
-      //GoogleAuthApi.signOut();
-
-      // Create the email that will be sent
-
-      final message = Message()
-        ..from = Address(email)
-        ..recipients = [email]
-        ..subject = 'Database Export - ${DateTime.now()}'
-        ..text = 'Your database is attached.'
-        ..attachments = [
-          FileAttachment(File(dbFile))..location = Location.attachment
-        ];
-
-      await send(message, smtpServer);
-      final emailSentSnackBar =
-          SnackBar(content: Text("Database sent to $email."));
-      global.snackbarKey.currentState?.showSnackBar(emailSentSnackBar);
-    } on MailerException catch (e) {
-      const emailFailedSnackBar = SnackBar(
-        content: Text(
-            "There was a problem sending the email. Please reload the app and try again."),
-      );
-      global.snackbarKey.currentState?.showSnackBar(emailFailedSnackBar);
-      print(e);
-    }
-  }
 
   // Build approach setup page
 
@@ -411,13 +302,13 @@ class ApproachSetup extends StatelessWidget {
             height: 250,
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  const Center(
+                children: const [
+                  Center(
                       child: Text(
-                    "Stance",
+                    "Shot Type",
                     textScaleFactor: 1.25,
                   )),
-                  _StanceSelectorChip()
+                  AppShotTypeSelectorChip()
                 ]),
           ),
           const Divider(),
@@ -425,13 +316,13 @@ class ApproachSetup extends StatelessWidget {
             height: 200,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                const Center(
+              children: const [
+                Center(
                     child: Text(
-                  "Shot Type",
+                  "Shot Angle",
                   textScaleFactor: 1.25,
                 )),
-                _ShotTypeSelectorChip(),
+                AppShotAngleSelectorChip(),
               ],
             ),
           ),
@@ -504,23 +395,6 @@ class ApproachSetup extends StatelessWidget {
               ),
             ],
           ),
-          const Divider(),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(50, 20, 50, 20),
-            child: ElevatedButton(
-              onPressed: () {
-                try {
-                  sendEmail();
-                } on Exception catch (e) {
-                  print(e);
-                }
-              },
-              onLongPress: () {
-                const Tooltip(message: 'Send Database.db as an email');
-              },
-              child: const Text("Export Database"),
-            ),
-          ),
         ],
       ),
     );
@@ -570,735 +444,13 @@ class _NotesFieldState extends State<NotesField> {
   Widget build(BuildContext context) {
     return TextField(
       controller: notesController,
+      textCapitalization: TextCapitalization.sentences,
+      autocorrect: true,
       onChanged: (String value) {
         global.notes = value;
       },
       decoration: const InputDecoration(hintText: "Any notes?"),
       maxLines: null,
-    );
-  }
-}
-
-//
-// This is where the code for the Choice Chips goes
-//
-
-class _ShotTypeSelectorChip extends StatefulWidget {
-  @override
-  _ShotTypeSelectorChipState createState() => _ShotTypeSelectorChipState();
-}
-
-class _ShotTypeSelectorChipState extends State<_ShotTypeSelectorChip>
-    with RestorationMixin {
-  final RestorableInt _indexSelected = RestorableInt(global.shotType);
-
-  @override
-  String get restorationId => 'choice_chip_demo';
-
-  @override
-  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-    registerForRestoration(_indexSelected, 'choice_chip');
-  }
-
-  @override
-  void dispose() {
-    _indexSelected.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Wrap(
-        children: [
-          ChoiceChip(
-            label: const Text("Hyzer"),
-            selected: _indexSelected.value == 0,
-            onSelected: (value) {
-              setState(() {
-                _indexSelected.value = value ? 0 : -1;
-                global.shotType = 0;
-              });
-            },
-          ),
-          const SizedBox(width: 8),
-          ChoiceChip(
-            label: const Text("Flat"),
-            selected: _indexSelected.value == 1,
-            onSelected: (value) {
-              setState(() {
-                _indexSelected.value = value ? 1 : -1;
-                global.shotType = 1;
-              });
-            },
-          ),
-          const SizedBox(width: 8),
-          ChoiceChip(
-            label: const Text("Anhyzer"),
-            selected: _indexSelected.value == 2,
-            onSelected: (value) {
-              setState(() {
-                _indexSelected.value = value ? 2 : -1;
-                global.shotType = 2;
-              });
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// Stance Selector Chip
-
-class _StanceSelectorChip extends StatefulWidget {
-  @override
-  _StanceSelectorChipState createState() => _StanceSelectorChipState();
-}
-
-class _StanceSelectorChipState extends State<_StanceSelectorChip>
-    with RestorationMixin {
-  final RestorableInt _indexSelected = RestorableInt(global.stance == "Normal"
-      ? 0
-      : (global.stance == "Straddle"
-          ? 1
-          : (global.stance == "Kneeling"
-              ? 2
-              : (global.stance == "Reaching Right" ? 3 : 4))));
-
-  @override
-  String get restorationId => 'choice_chip_demo';
-
-  @override
-  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-    registerForRestoration(_indexSelected, 'choice_chip');
-  }
-
-  @override
-  void dispose() {
-    _indexSelected.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Wrap(
-        children: [
-          ChoiceChip(
-            label: const Text("Normal"),
-            selected: _indexSelected.value == 0,
-            onSelected: (value) {
-              setState(() {
-                _indexSelected.value = value ? 0 : -1;
-                global.stance = "Normal";
-              });
-            },
-          ),
-          const SizedBox(width: 8),
-          ChoiceChip(
-            label: const Text("Straddle"),
-            selected: _indexSelected.value == 1,
-            onSelected: (value) {
-              setState(() {
-                _indexSelected.value = value ? 1 : -1;
-                global.stance = "Straddle";
-              });
-            },
-          ),
-          const SizedBox(width: 8),
-          ChoiceChip(
-            label: const Text("Kneeling"),
-            selected: _indexSelected.value == 2,
-            onSelected: (value) {
-              setState(() {
-                _indexSelected.value = value ? 2 : -1;
-                global.stance = "Kneeling";
-              });
-            },
-          ),
-          const SizedBox(width: 8),
-          ChoiceChip(
-            label: const Text("Reaching Right"),
-            selected: _indexSelected.value == 3,
-            onSelected: (value) {
-              setState(() {
-                _indexSelected.value = value ? 3 : -1;
-                global.stance = "Reaching Right";
-              });
-            },
-          ),
-          const SizedBox(width: 8),
-          ChoiceChip(
-            label: const Text("Reaching Left"),
-            selected: _indexSelected.value == 4,
-            onSelected: (value) {
-              setState(() {
-                _indexSelected.value = value ? 4 : -1;
-                global.stance = "Reaching Left";
-              });
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-//
-// This is where the stackSize Slider Code goes
-//
-
-class StackSizeSliders extends StatefulWidget {
-  const StackSizeSliders({Key? key}) : super(key: key);
-
-  @override
-  StackSizeSlidersState createState() => StackSizeSlidersState();
-}
-
-class StackSizeSlidersState extends State<StackSizeSliders>
-    with RestorationMixin {
-  final RestorableInt _continuousValue = RestorableInt(global.stackSize);
-
-  @override
-  String get restorationId => 'stackSize_slider';
-
-  @override
-  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-    registerForRestoration(_continuousValue, 'continuous_value');
-  }
-
-  @override
-  void dispose() {
-    _continuousValue.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Semantics(
-                child: SizedBox(
-                  width: 64,
-                  height: 48,
-                  child: TextField(
-                    textAlign: TextAlign.center,
-                    onSubmitted: (value) {
-                      final newValue = int.tryParse(value);
-                      if (newValue != null &&
-                          newValue != _continuousValue.value) {
-                        setState(() {
-                          _continuousValue.value =
-                              newValue.clamp(0, 20).truncate();
-                          global.stackSize = newValue.clamp(0, 20).toInt();
-                        });
-                      }
-                    },
-                    keyboardType: TextInputType.number,
-                    controller: TextEditingController(
-                      text: _continuousValue.value.toStringAsFixed(0),
-                    ),
-                  ),
-                ),
-              ),
-              Slider(
-                value: _continuousValue.value.toDouble(),
-                min: 0,
-                max: 20,
-                onChanged: (value) {
-                  setState(() {
-                    _continuousValue.value = value.toInt();
-                    global.stackSize = value.toInt();
-                  });
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// Approach Stack Size Slider
-
-class AppStackSizeSliders extends StatefulWidget {
-  const AppStackSizeSliders({Key? key}) : super(key: key);
-
-  @override
-  AppStackSizeSlidersState createState() => AppStackSizeSlidersState();
-}
-
-class AppStackSizeSlidersState extends State<AppStackSizeSliders>
-    with RestorationMixin {
-  final RestorableInt _continuousValue = RestorableInt(global.appStackSize);
-
-  @override
-  String get restorationId => 'appStackSize_slider';
-
-  @override
-  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-    registerForRestoration(_continuousValue, 'continuous_value');
-  }
-
-  @override
-  void dispose() {
-    _continuousValue.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Semantics(
-                child: SizedBox(
-                  width: 64,
-                  height: 48,
-                  child: TextField(
-                    textAlign: TextAlign.center,
-                    onSubmitted: (value) {
-                      final newValue = int.tryParse(value);
-                      if (newValue != null &&
-                          newValue != _continuousValue.value) {
-                        setState(() {
-                          _continuousValue.value =
-                              newValue.clamp(0, 20).truncate();
-                          global.appStackSize = newValue.clamp(0, 20).toInt();
-                        });
-                      }
-                    },
-                    keyboardType: TextInputType.number,
-                    controller: TextEditingController(
-                      text: _continuousValue.value.toStringAsFixed(0),
-                    ),
-                  ),
-                ),
-              ),
-              Slider(
-                value: _continuousValue.value.toDouble(),
-                min: 0,
-                max: 20,
-                onChanged: (value) {
-                  setState(() {
-                    _continuousValue.value = value.toInt();
-                    global.appStackSize = value.toInt();
-                  });
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-//
-// This is where the distance slider code goes
-
-class DistanceSliders extends StatefulWidget {
-  const DistanceSliders({Key? key}) : super(key: key);
-
-  @override
-  DistanceSlidersState createState() => DistanceSlidersState();
-}
-
-class DistanceSlidersState extends State<DistanceSliders>
-    with RestorationMixin {
-  final RestorableInt _continuousValue = RestorableInt(global.distance);
-
-  @override
-  String get restorationId => 'distance_slider';
-
-  @override
-  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-    registerForRestoration(_continuousValue, 'continuous_value');
-  }
-
-  @override
-  void dispose() {
-    _continuousValue.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Semantics(
-                child: SizedBox(
-                  width: 64,
-                  height: 48,
-                  child: TextField(
-                    textAlign: TextAlign.center,
-                    onSubmitted: (value) {
-                      final newValue = double.tryParse(value);
-                      if (newValue != null &&
-                          newValue != _continuousValue.value) {
-                        setState(() {
-                          _continuousValue.value =
-                              newValue.clamp(0, 300).truncate();
-                          global.distance = newValue.clamp(0, 300).toInt();
-                        });
-                      }
-                    },
-                    keyboardType: TextInputType.number,
-                    controller: TextEditingController(
-                      text: _continuousValue.value.toStringAsFixed(0),
-                    ),
-                  ),
-                ),
-              ),
-              Slider(
-                value: _continuousValue.value.toDouble(),
-                min: 0,
-                max: 300,
-                onChanged: (value) {
-                  setState(() {
-                    _continuousValue.value = value.toInt();
-                    global.distance = value.toInt();
-                  });
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class AppDistanceSliders extends StatefulWidget {
-  const AppDistanceSliders({Key? key}) : super(key: key);
-
-  @override
-  AppDistanceSlidersState createState() => AppDistanceSlidersState();
-}
-
-class AppDistanceSlidersState extends State<AppDistanceSliders>
-    with RestorationMixin {
-  final RestorableInt _continuousValue = RestorableInt(global.appDistance);
-
-  @override
-  String get restorationId => 'distance_slider';
-
-  @override
-  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-    registerForRestoration(_continuousValue, 'continuous_value');
-  }
-
-  @override
-  void dispose() {
-    _continuousValue.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Semantics(
-                child: SizedBox(
-                  width: 64,
-                  height: 48,
-                  child: TextField(
-                    textAlign: TextAlign.center,
-                    onSubmitted: (value) {
-                      final newValue = double.tryParse(value);
-                      if (newValue != null &&
-                          newValue != _continuousValue.value) {
-                        setState(() {
-                          _continuousValue.value =
-                              newValue.clamp(0, 300).truncate();
-                          global.appDistance = newValue.clamp(0, 300).toInt();
-                        });
-                      }
-                    },
-                    keyboardType: TextInputType.number,
-                    controller: TextEditingController(
-                      text: _continuousValue.value.toStringAsFixed(0),
-                    ),
-                  ),
-                ),
-              ),
-              Slider(
-                value: _continuousValue.value.toDouble(),
-                min: 50,
-                max: 300,
-                onChanged: (value) {
-                  setState(() {
-                    _continuousValue.value = value.toInt();
-                    global.appDistance = value.toInt();
-                  });
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// Putting Goal Slider
-
-class GoalSliders extends StatefulWidget {
-  const GoalSliders({Key? key}) : super(key: key);
-
-  @override
-  GoalSlidersState createState() => GoalSlidersState();
-}
-
-class GoalSlidersState extends State<GoalSliders> with RestorationMixin {
-  final RestorableInt _continuousValue = RestorableInt(global.goal);
-
-  @override
-  String get restorationId => 'goal_slider';
-
-  @override
-  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-    registerForRestoration(_continuousValue, 'continuous_value');
-  }
-
-  @override
-  void dispose() {
-    _continuousValue.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Semantics(
-                child: SizedBox(
-                  width: 64,
-                  height: 48,
-                  child: TextField(
-                    textAlign: TextAlign.center,
-                    onSubmitted: (value) {
-                      final newValue = double.tryParse(value);
-                      if (newValue != null &&
-                          newValue != _continuousValue.value) {
-                        setState(() {
-                          _continuousValue.value =
-                              newValue.clamp(0, 200).truncate();
-                          global.goal = newValue.clamp(0, 200).toInt();
-                        });
-                      }
-                    },
-                    keyboardType: TextInputType.number,
-                    controller: TextEditingController(
-                      text: _continuousValue.value.toStringAsFixed(0),
-                    ),
-                  ),
-                ),
-              ),
-              Slider(
-                value: _continuousValue.value.toDouble(),
-                min: 0,
-                max: 200,
-                onChanged: (value) {
-                  setState(() {
-                    _continuousValue.value = value.toInt();
-                    global.goal = value.toInt();
-                  });
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// Approach Goal Slider
-
-class AppGoalSliders extends StatefulWidget {
-  const AppGoalSliders({Key? key}) : super(key: key);
-
-  @override
-  AppGoalSlidersState createState() => AppGoalSlidersState();
-}
-
-class AppGoalSlidersState extends State<AppGoalSliders> with RestorationMixin {
-  final RestorableInt _continuousValue = RestorableInt(global.appGoal);
-
-  @override
-  String get restorationId => 'appGoal_slider';
-
-  @override
-  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-    registerForRestoration(_continuousValue, 'continuous_value');
-  }
-
-  @override
-  void dispose() {
-    _continuousValue.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Semantics(
-                child: SizedBox(
-                  width: 64,
-                  height: 48,
-                  child: TextField(
-                    textAlign: TextAlign.center,
-                    onSubmitted: (value) {
-                      final newValue = double.tryParse(value);
-                      if (newValue != null &&
-                          newValue != _continuousValue.value) {
-                        setState(() {
-                          _continuousValue.value =
-                              newValue.clamp(0, 200).truncate();
-                          global.appGoal = newValue.clamp(0, 200).toInt();
-                        });
-                      }
-                    },
-                    keyboardType: TextInputType.number,
-                    controller: TextEditingController(
-                      text: _continuousValue.value.toStringAsFixed(0),
-                    ),
-                  ),
-                ),
-              ),
-              Slider(
-                value: _continuousValue.value.toDouble(),
-                min: 0,
-                max: 200,
-                onChanged: (value) {
-                  setState(() {
-                    _continuousValue.value = value.toInt();
-                    global.appGoal = value.toInt();
-                  });
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// TargetSize Sliders
-class TargetSizeSliders extends StatefulWidget {
-  const TargetSizeSliders({Key? key}) : super(key: key);
-
-  @override
-  TargetSizeSlidersState createState() => TargetSizeSlidersState();
-}
-
-class TargetSizeSlidersState extends State<TargetSizeSliders>
-    with RestorationMixin {
-  final RestorableInt _continuousValue = RestorableInt(global.appTargetSize);
-
-  @override
-  String get restorationId => 'TargetSize_slider';
-
-  @override
-  void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-    registerForRestoration(_continuousValue, 'continuous_value');
-  }
-
-  @override
-  void dispose() {
-    _continuousValue.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Semantics(
-                child: SizedBox(
-                  width: 64,
-                  height: 48,
-                  child: TextField(
-                    textAlign: TextAlign.center,
-                    onSubmitted: (value) {
-                      final newValue = int.tryParse(value);
-                      if (newValue != null &&
-                          newValue != _continuousValue.value) {
-                        setState(() {
-                          _continuousValue.value =
-                              newValue.clamp(0, 50).truncate();
-                          global.appTargetSize = newValue.clamp(0, 50).toInt();
-                        });
-                      }
-                    },
-                    keyboardType: TextInputType.number,
-                    controller: TextEditingController(
-                      text: _continuousValue.value.toStringAsFixed(0),
-                    ),
-                  ),
-                ),
-              ),
-              Slider(
-                value: _continuousValue.value.toDouble(),
-                min: 0,
-                max: 50,
-                onChanged: (value) {
-                  setState(() {
-                    _continuousValue.value = value.toInt();
-                    global.appTargetSize = value.toInt();
-                  });
-                },
-              ),
-            ],
-          ),
-        ],
-      ),
     );
   }
 }
@@ -1496,7 +648,7 @@ class _CounterState extends State<Counter> {
                       DataBaseHelper.columnDate: DateTime.now().toString(),
                       DataBaseHelper.columnThrows: global.count,
                       DataBaseHelper.columnMakes: global.makes,
-                      DataBaseHelper.columnShotType: global.shotType,
+                      DataBaseHelper.columnShotAngle: global.shotAngle,
                       DataBaseHelper.columnDistance: global.distance,
                       DataBaseHelper.columnStackSize: global.stackSize,
                       DataBaseHelper.columnStance: global.stance,
@@ -1511,7 +663,7 @@ class _CounterState extends State<Counter> {
                     });
                     final snackBar = SnackBar(
                         content: Text(
-                            "Logged session $i to putting table:\n\nYou made $currentMakes of $currentCount ${global.shotType == 0 ? "hyzer" : (global.shotType == 1 ? "flat" : "anhyzer")} throws from ${global.distance} feet."),
+                            "Logged session $i to putting table:\n\nYou made $currentMakes of $currentCount ${global.shotAngle == 0 ? "hyzer" : (global.shotAngle == 1 ? "flat" : "anhyzer")} throws from ${global.distance} feet."),
 
                         // Undo Session Log
                         action: SnackBarAction(
@@ -1648,13 +800,14 @@ class _ApproachCounterState extends State<ApproachCounterState> {
                           DateTime.now().toString(),
                       ApproachDataBaseHelper.columnThrows: global.appCount,
                       ApproachDataBaseHelper.columnMakes: global.appMakes,
-                      ApproachDataBaseHelper.columnShotType: global.appShotType,
+                      ApproachDataBaseHelper.columnShotAngle:
+                          global.appShotAngle,
                       ApproachDataBaseHelper.columnDistance: global.appDistance,
                       ApproachDataBaseHelper.columnTargetSize:
                           global.appTargetSize,
                       ApproachDataBaseHelper.columnStackSize:
                           global.appStackSize,
-                      ApproachDataBaseHelper.columnStance: global.appStance,
+                      ApproachDataBaseHelper.columnShotType: global.appShotType,
                       ApproachDataBaseHelper.columnNotes: global.appNotes,
                     });
 
@@ -1666,7 +819,7 @@ class _ApproachCounterState extends State<ApproachCounterState> {
                     });
                     final snackBar = SnackBar(
                         content: Text(
-                            "Logged session $i to approach table:\n\nYou made $currentMakes of $currentCount ${global.appShotType == 0 ? "hyzer" : (global.appShotType == 1 ? "flat" : "anhyzer")} throws from ${global.appDistance} feet."),
+                            "Logged session $i to approach table:\n\nYou made $currentMakes of $currentCount ${global.appShotAngle == 0 ? "hyzer" : (global.appShotAngle == 1 ? "flat" : "anhyzer")} ${global.appShotType == "Backhand" ? "backhand" : "forehand"} throws from ${global.appDistance} feet."),
 
                         // Undo Session Log
                         action: SnackBarAction(

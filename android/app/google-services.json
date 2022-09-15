@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "272016534693",
-    "project_id": "signin-dfc0d",
-    "storage_bucket": "signin-dfc0d.appspot.com"
+    "project_number": "699530172818",
+    "project_id": "chains-disc-golf-practice-app",
+    "storage_bucket": "chains-disc-golf-practice-app.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:272016534693:android:2e8440e57eca91106df14c",
+        "mobilesdk_app_id": "1:699530172818:android:bea5a6fbf163e1d938094b",
         "android_client_info": {
-          "package_name": "com.example.putting_app_v2"
+          "package_name": "com.vertexvantage.chains"
         }
       },
       "oauth_client": [
         {
-          "client_id": "272016534693-5svrhij4sfnk3bf0qibp66t82a4sfist.apps.googleusercontent.com",
+          "client_id": "699530172818-vl52qnhd91i71006mn2vdd588mor9dma.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCAYO_hq0eBsaNn8YQ6yi-kFsIN3NyoRF0"
+          "current_key": "AIzaSyBtWZ42OyA4QWlXdtnBZEJi3Lo_FfqGaGs"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "272016534693-5svrhij4sfnk3bf0qibp66t82a4sfist.apps.googleusercontent.com",
+              "client_id": "699530172818-vl52qnhd91i71006mn2vdd588mor9dma.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
+var version = 2.4;
+
 // Set default values for initial run
 var count = 0;
 var name = "Janne";
 var makes = 0;
 var previousMake = 0;
 var stackSize = 5;
-var distance = 15;
-var shotType = 1;
+var distance = 30;
+var shotAngle = 1;
 var stance = 'Normal';
 var goal = 100;
 var date = "";
@@ -28,9 +30,9 @@ var appPreviousMake = 0;
 var appStackSize = 5;
 var appDistance = 150;
 var appTargetSize = 15;
-var appShotType = 1;
-var appStance = '';
-var appGoal = 100;
+var appShotAngle = 1;
+var appShotType = "Backhand";
+var appGoal = 30;
 var appDate = "";
 var appStartTab = 0;
 var appTable = [];

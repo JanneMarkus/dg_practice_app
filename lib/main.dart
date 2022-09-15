@@ -129,8 +129,7 @@ class ApplicationSetup extends StatelessWidget {
               child: Center(
                   child: Opacity(
                 opacity: 0.5,
-                child:
-                    Text("Disc Golf Practice App Version: ${global.version}"),
+                child: Text("Running Chains Version: ${global.version}"),
               ))),
         ],
       ),

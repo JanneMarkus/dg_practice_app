@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:mailer/smtp_server/gmail.dart';
 import 'global.dart' as global;
@@ -137,6 +138,96 @@ class ApplicationSetup extends StatelessWidget {
   }
 }
 
+//Static Table for now. Update to get database info later.
+final allSessions = <Session>[
+  Session(accuracy: 50, distance: 10, id: 1),
+  Session(accuracy: 45, distance: 50, id: 2),
+  Session(accuracy: 80, distance: 20, id: 3),
+  Session(accuracy: 100, distance: 30, id: 4),
+  Session(accuracy: 20, distance: 15, id: 5),
+  Session(accuracy: 50, distance: 25, id: 6),
+  Session(accuracy: 65, distance: 25, id: 7),
+  Session(accuracy: 22, distance: 5, id: 8),
+  Session(accuracy: 5, distance: 20, id: 9),
+  Session(accuracy: 45, distance: 60, id: 10),
+];
+
+class Session {
+  final int distance;
+  final int accuracy;
+  final int id;
+
+  const Session({
+    required this.distance,
+    required this.accuracy,
+    required this.id,
+  });
+}
+
+class testing extends StatefulWidget {
+  const testing({Key? key}) : super(key: key);
+
+  @override
+  State<testing> createState() => _testingState();
+}
+
+class _testingState extends State<testing> {
+  int? sortColumnIndex;
+  bool isAscending = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final columns = ['Distance', 'Accuracy'];
+
+    return Row(
+      children: [
+        Expanded(
+          child: DataTable(
+              sortAscending: isAscending,
+              sortColumnIndex: sortColumnIndex,
+              columns: getColumns(columns),
+              rows: getRows(allSessions)),
+        ),
+      ],
+    );
+  }
+
+  List<DataColumn> getColumns(List<String> columns) => columns
+      .map((String column) => DataColumn(
+            label: Text(column),
+            onSort: onSort,
+          ))
+      .toList();
+
+  List<DataRow> getRows(List<Session> sessions) =>
+      sessions.map((Session session) {
+        final cells = [session.distance, session.accuracy];
+
+        return DataRow(cells: getCells(cells));
+      }).toList();
+
+  List<DataCell> getCells(List<dynamic> cells) =>
+      cells.map((data) => DataCell(Text('$data'))).toList();
+
+  void onSort(int columnIndex, bool ascending) {
+    if (columnIndex == 0) {
+      allSessions.sort((session1, session2) =>
+          compareInt(ascending, session1.distance, session2.distance));
+    } else if (columnIndex == 1) {
+      allSessions.sort((session1, session2) =>
+          compareInt(ascending, session1.accuracy, session2.accuracy));
+    }
+
+    setState(() {
+      this.sortColumnIndex = columnIndex;
+      this.isAscending = ascending;
+    });
+  }
+
+  int compareInt(bool ascending, int value1, int value2) =>
+      ascending ? value1.compareTo(value2) : value2.compareTo(value1);
+}
+
 class NavigationDrawer extends StatelessWidget {
   const NavigationDrawer({Key? key}) : super(key: key);
 
@@ -166,6 +257,12 @@ class NavigationDrawer extends StatelessWidget {
                 onTap: () {
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
                       builder: (context) => const SettingsWidget()));
+                }),
+            ListTile(
+                title: const Text("My Stats"),
+                onTap: () {
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => const MyStatsWidget()));
                 }),
             // ListTile(
             //   title: const Text("Long Throws"),

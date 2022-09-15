@@ -104,3 +104,21 @@ class SettingsWidget extends StatelessWidget {
         body: const ApplicationSetup());
   }
 }
+
+// My Stats widget
+
+class MyStatsWidget extends StatelessWidget {
+  const MyStatsWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text("My Stats"),
+          toolbarHeight: 50,
+        ),
+        drawer: const NavigationDrawer(),
+        // Change ApplicationSetup to the widget for My Stats
+        body: const testing());
+  }
+}

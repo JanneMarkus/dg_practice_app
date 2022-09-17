@@ -164,14 +164,107 @@ class Session {
   });
 }
 
-class testing extends StatefulWidget {
-  const testing({Key? key}) : super(key: key);
+class MyStatsDashboard extends StatelessWidget {
+  const MyStatsDashboard({super.key});
 
   @override
-  State<testing> createState() => _testingState();
+  Widget build(BuildContext context) {
+    return ListView(children: [
+      Padding(
+        padding: const EdgeInsets.all(25),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [StatsC1Dial(), StatsC2Dial()],
+        ),
+      ),
+      const StatsDataTable(),
+    ]);
+    //]);
+  }
 }
 
-class _testingState extends State<testing> {
+class StatsC1Dial extends StatefulWidget {
+  const StatsC1Dial({super.key});
+  @override
+  State<StatsC1Dial> createState() => _StatsC1DialState();
+}
+
+class _StatsC1DialState extends State<StatsC1Dial> {
+  final double value = .75;
+  final String title = "C1 Accuracy";
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      SizedBox(
+          width: 150,
+          height: 150,
+          child: Stack(fit: StackFit.expand, children: [
+            CircularProgressIndicator(
+              value: value,
+              strokeWidth: 15,
+            ),
+            Center(
+                child: Text(
+              '${value * 100}',
+              textScaleFactor: 2.5,
+            )),
+          ])),
+      Padding(
+        padding: const EdgeInsets.all(20),
+        child: Text(
+          '${title}',
+          textScaleFactor: 1.5,
+        ),
+      )
+    ]);
+  }
+}
+
+class StatsC2Dial extends StatefulWidget {
+  const StatsC2Dial({super.key});
+  @override
+  State<StatsC2Dial> createState() => _StatsC2DialState();
+}
+
+class _StatsC2DialState extends State<StatsC2Dial> {
+  final double value = .9;
+  final String title = "C2 Accuracy";
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      SizedBox(
+          width: 150,
+          height: 150,
+          child: Stack(fit: StackFit.expand, children: [
+            CircularProgressIndicator(
+              value: value,
+              strokeWidth: 15,
+            ),
+            Center(
+                child: Text(
+              '${value * 100}',
+              textScaleFactor: 2.5,
+            )),
+          ])),
+      Padding(
+        padding: const EdgeInsets.all(20),
+        child: Text(
+          '${title}',
+          textScaleFactor: 1.5,
+        ),
+      )
+    ]);
+  }
+}
+
+class StatsDataTable extends StatefulWidget {
+  const StatsDataTable({Key? key}) : super(key: key);
+
+  @override
+  State<StatsDataTable> createState() => _StatsDataTableState();
+}
+
+class _StatsDataTableState extends State<StatsDataTable> {
   int? sortColumnIndex;
   bool isAscending = false;
 

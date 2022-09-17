@@ -119,6 +119,6 @@ class MyStatsWidget extends StatelessWidget {
         ),
         drawer: const NavigationDrawer(),
         // Change ApplicationSetup to the widget for My Stats
-        body: const testing());
+        body: const MyStatsDashboard());
   }
 }

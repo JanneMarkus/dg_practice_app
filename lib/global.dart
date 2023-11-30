@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-var version = 2.4;
+var version = 2.5;
 
 // Set default values for initial run
 var count = 0;
@@ -10,8 +10,8 @@ var previousMake = 0;
 var stackSize = 5;
 var distance = 30;
 var shotAngle = 1;
-var stance = 'Normal';
-var goal = 100;
+var stance = 'Straddle';
+var goal = 50;
 var date = "";
 var green = const Color.fromRGBO(152, 190, 100, 1);
 var backgroundColor = Colors.transparent;
